@@ -1,17 +1,21 @@
+"""
+## Example
+
+```py
+import Imagga
+image = b"text instead of image"
+response = imagga.RequestBuilder.default().request_tags(image)
+```
+"""
+
 from typing import final as _final, Self as _Self, Any as _Any
 import requests as _requests
 
-import config as _config
+from . import config as _config
 
 
 @_final
 class RequestBuilder:
-    """## Example
-    ```py
-    response = RequestBuilder.default().request_tags()
-    ```
-    """
-
     __languages: list[str]
     __auth: tuple[str, str]
 
@@ -21,8 +25,14 @@ class RequestBuilder:
 
     @classmethod
     def default(cls) -> "RequestBuilder":
-        instance = cls(languages=["en", "ko"])
+        """Construct `RequestBuilder` with default attributes."""
+        instance = cls(languages=["en"])
         return instance
+
+    def add_language(self, language: str) -> _Self:
+        """Adds language to tags request. [Supported languages](https://docs.imagga.com/#multi-language-support)."""
+        self.__languages.append(language)
+        return self
 
     def request_tags(self, image: bytes) -> _Any:
         """Requests tags from Imagga."""
@@ -34,7 +44,7 @@ class RequestBuilder:
             auth=self.__auth,
             data=post_form,
         )
-        return response
+        return response.json()
 
     def request_colors(self, image: bytes) -> _Any:
         """Requests colors from Imagga."""
@@ -46,4 +56,4 @@ class RequestBuilder:
             auth=self.__auth,
             data=post_form,
         )
-        return response
+        return response.json()

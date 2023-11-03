@@ -1,7 +1,6 @@
 """
-Parses constants from config.toml file
+Parses constants from `config.toml` file
 """
-
 
 from typing import Final as _Final
 import toml as _toml
