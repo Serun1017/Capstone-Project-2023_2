@@ -1,43 +1,49 @@
-from typing import final, Self
-import requests
+from typing import final as _final, Self as _Self, Any as _Any
+import requests as _requests
+
+import config as _config
 
 
-@final
+@_final
 class RequestBuilder:
     """## Example
     ```py
-    request_builder = RequestBuilder.default()
+    response = RequestBuilder.default().request_tags()
     ```
     """
 
     __languages: list[str]
+    __auth: tuple[str, str]
 
     def __init__(self, languages: list[str]):
         self.__languages = languages
+        self.__auth = (_config.IMAGGA_KEY, _config.IMAGGA_SECRET)
 
     @classmethod
     def default(cls) -> "RequestBuilder":
         instance = cls(languages=["en", "ko"])
         return instance
 
-    def auth(self, auth_key: str, auth_secret: str) -> Self:
-        return self
+    def request_tags(self, image: bytes) -> _Any:
+        """Requests tags from Imagga."""
 
-    def request_tags(self, image: bytes):
-        """ """
-        post_form = {"language": ",".join(self.__languages)}
-        requests.post("https://api.imagga.com/v2/tags", data=post_form)
-        pass
+        post_form = {"language": ",".join(self.__languages), "image": image}
+        response = _requests.post(
+            # "https://httpbin.org/post",  # debug url
+            "https://api.imagga.com/v2/tags",
+            auth=self.__auth,
+            data=post_form,
+        )
+        return response
 
-    def request_colors(self, image: bytes):
-        """
-        Requests colors from Imagga. All of the builder attributes are ignored.
+    def request_colors(self, image: bytes) -> _Any:
+        """Requests colors from Imagga."""
 
-        ## Parameters
-        - image: bytes
-            Image data in bytes
-
-        ## Returns
-        """
         post_form = {}
-        requests.post("https://api.imagga.com/v2/tags", data=post_form)
+        response = _requests.post(
+            # "https://httpbin.org/post",  # debug url
+            "https://api.imagga.com/v2/colors",
+            auth=self.__auth,
+            data=post_form,
+        )
+        return response

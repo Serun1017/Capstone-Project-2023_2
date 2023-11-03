@@ -12,7 +12,7 @@ Docstring(파이썬 기능)으로 코드를 설명하고 pdoc으로 읽기 좋�
 가상 환경은 docker처럼 파이썬이 패키지를 찾는 위치를 시스템으로부터 독립시키고, 여러 컴퓨터에서 작업을 할때 서로 다른 환경이 아니도록 도와준다.
 이런 가상 환경을 관리해주는 매니저로 Poetry를 사용하도록 하자.
 
-#### Install
+#### Poetry Install
 
 Windows (Powershell)
 ```sh
@@ -24,7 +24,7 @@ Unix
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-#### Config
+#### Poetry Config
 
 Poetry는 기본으로 시스템 홈 폴더에 가상 환경을 만들어 주는데 VSCode 같은 에디터와의 가상 환경 호환을 위해서는 프로젝트 폴더에 만드는 것이 유리하다.
 
@@ -35,7 +35,7 @@ poetry config virtualenvs.path "./.venv" # Virtual environment path is .venv
 
 VSCode를 이용한다면 LSP와 연결을 위해 `Python: Select Interpreter`를 .venv/bin/python으로 지정해주자.
 
-#### Usage
+#### Poetry Usage
 
 ```sh
 # pyproject.toml을 읽고 가상환경에 패키지를 설치한다.

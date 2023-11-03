@@ -1,0 +1,556 @@
+{
+	"result": {
+		"tags": [
+			{
+				"confidence": 100,
+				"tag": {
+					"en": "park",
+					"ko": "공원"
+				}
+			},
+			{
+				"confidence": 100,
+				"tag": {
+					"en": "tract",
+					"ko": "요로"
+				}
+			},
+			{
+				"confidence": 35.1610641479492,
+				"tag": {
+					"en": "architecture",
+					"ko": "아키텍처"
+				}
+			},
+			{
+				"confidence": 34.4526023864746,
+				"tag": {
+					"en": "sky",
+					"ko": "스카이"
+				}
+			},
+			{
+				"confidence": 33.3021774291992,
+				"tag": {
+					"en": "church",
+					"ko": "교회"
+				}
+			},
+			{
+				"confidence": 33.167724609375,
+				"tag": {
+					"en": "religion",
+					"ko": "종교"
+				}
+			},
+			{
+				"confidence": 31.9264240264893,
+				"tag": {
+					"en": "building",
+					"ko": "건물"
+				}
+			},
+			{
+				"confidence": 26.9774341583252,
+				"tag": {
+					"en": "dome",
+					"ko": "돔"
+				}
+			},
+			{
+				"confidence": 26.8800182342529,
+				"tag": {
+					"en": "cathedral",
+					"ko": "대성당"
+				}
+			},
+			{
+				"confidence": 26.7657947540283,
+				"tag": {
+					"en": "travel",
+					"ko": "여행"
+				}
+			},
+			{
+				"confidence": 25.5860538482666,
+				"tag": {
+					"en": "tourism",
+					"ko": "관광"
+				}
+			},
+			{
+				"confidence": 24.472282409668,
+				"tag": {
+					"en": "orthodox",
+					"ko": "정교회"
+				}
+			},
+			{
+				"confidence": 24.2004146575928,
+				"tag": {
+					"en": "famous",
+					"ko": "유명한"
+				}
+			},
+			{
+				"confidence": 24.1164588928223,
+				"tag": {
+					"en": "city",
+					"ko": "도시"
+				}
+			},
+			{
+				"confidence": 23.6956806182861,
+				"tag": {
+					"en": "old",
+					"ko": "오래 된"
+				}
+			},
+			{
+				"confidence": 23.563102722168,
+				"tag": {
+					"en": "cross",
+					"ko": "크로스"
+				}
+			},
+			{
+				"confidence": 22.5746040344238,
+				"tag": {
+					"en": "landmark",
+					"ko": "랜드마크"
+				}
+			},
+			{
+				"confidence": 22.3867855072021,
+				"tag": {
+					"en": "tower",
+					"ko": "타워"
+				}
+			},
+			{
+				"confidence": 20.5793972015381,
+				"tag": {
+					"en": "history",
+					"ko": "역사"
+				}
+			},
+			{
+				"confidence": 20.5185546875,
+				"tag": {
+					"en": "culture",
+					"ko": "문화"
+				}
+			},
+			{
+				"confidence": 18.6887340545654,
+				"tag": {
+					"en": "monument",
+					"ko": "기념물"
+				}
+			},
+			{
+				"confidence": 18.4284381866455,
+				"tag": {
+					"en": "st",
+					"ko": "st"
+				}
+			},
+			{
+				"confidence": 18.1065826416016,
+				"tag": {
+					"en": "square",
+					"ko": "광장"
+				}
+			},
+			{
+				"confidence": 17.0860786437988,
+				"tag": {
+					"en": "capital",
+					"ko": "자본"
+				}
+			},
+			{
+				"confidence": 16.4935874938965,
+				"tag": {
+					"en": "basil",
+					"ko": "바 질"
+				}
+			},
+			{
+				"confidence": 16.0139427185059,
+				"tag": {
+					"en": "brick",
+					"ko": "벽돌"
+				}
+			},
+			{
+				"confidence": 15.4811716079712,
+				"tag": {
+					"en": "golden",
+					"ko": "골든"
+				}
+			},
+			{
+				"confidence": 15.1012077331543,
+				"tag": {
+					"en": "night",
+					"ko": "밤"
+				}
+			},
+			{
+				"confidence": 14.6722297668457,
+				"tag": {
+					"en": "historic",
+					"ko": "역사적인"
+				}
+			},
+			{
+				"confidence": 13.9789047241211,
+				"tag": {
+					"en": "gold",
+					"ko": "골드"
+				}
+			},
+			{
+				"confidence": 13.8466882705688,
+				"tag": {
+					"en": "basil s",
+					"ko": "바 질 s"
+				}
+			},
+			{
+				"confidence": 13.4545907974243,
+				"tag": {
+					"en": "destinations",
+					"ko": "목적지"
+				}
+			},
+			{
+				"confidence": 13.306471824646,
+				"tag": {
+					"en": "traditional",
+					"ko": "전통적인"
+				}
+			},
+			{
+				"confidence": 13.1747522354126,
+				"tag": {
+					"en": "historical",
+					"ko": "역사"
+				}
+			},
+			{
+				"confidence": 12.9050741195679,
+				"tag": {
+					"en": "exterior",
+					"ko": "외관"
+				}
+			},
+			{
+				"confidence": 12.5588417053223,
+				"tag": {
+					"en": "day",
+					"ko": "하루"
+				}
+			},
+			{
+				"confidence": 12.5089769363403,
+				"tag": {
+					"en": "saint",
+					"ko": "세인트"
+				}
+			},
+			{
+				"confidence": 11.9826688766479,
+				"tag": {
+					"en": "construction",
+					"ko": "건설"
+				}
+			},
+			{
+				"confidence": 11.5396375656128,
+				"tag": {
+					"en": "architectural",
+					"ko": "건축"
+				}
+			},
+			{
+				"confidence": 11.3429927825928,
+				"tag": {
+					"en": "center",
+					"ko": "센터"
+				}
+			},
+			{
+				"confidence": 11.1316967010498,
+				"tag": {
+					"en": "town",
+					"ko": "마"
+				}
+			},
+			{
+				"confidence": 10.8238973617554,
+				"tag": {
+					"en": "cupola",
+					"ko": "큐 폴라"
+				}
+			},
+			{
+				"confidence": 10.7265567779541,
+				"tag": {
+					"en": "bright",
+					"ko": "밝은"
+				}
+			},
+			{
+				"confidence": 10.6951379776001,
+				"tag": {
+					"en": "design",
+					"ko": "디자인"
+				}
+			},
+			{
+				"confidence": 10.4688196182251,
+				"tag": {
+					"en": "sun",
+					"ko": "태양"
+				}
+			},
+			{
+				"confidence": 10.4415969848633,
+				"tag": {
+					"en": "shape",
+					"ko": "모양"
+				}
+			},
+			{
+				"confidence": 10.3054933547974,
+				"tag": {
+					"en": "religious",
+					"ko": "종교적"
+				}
+			},
+			{
+				"confidence": 10.1031274795532,
+				"tag": {
+					"en": "symbol",
+					"ko": "기호"
+				}
+			},
+			{
+				"confidence": 10.0343751907349,
+				"tag": {
+					"en": "holiday",
+					"ko": "휴일"
+				}
+			},
+			{
+				"confidence": 9.86838722229004,
+				"tag": {
+					"en": "structure",
+					"ko": "구조"
+				}
+			},
+			{
+				"confidence": 9.86547565460205,
+				"tag": {
+					"en": "domes",
+					"ko": "돔"
+				}
+			},
+			{
+				"confidence": 9.70203685760498,
+				"tag": {
+					"en": "museum",
+					"ko": "박물관"
+				}
+			},
+			{
+				"confidence": 9.51523113250732,
+				"tag": {
+					"en": "ancient",
+					"ko": "고 대"
+				}
+			},
+			{
+				"confidence": 9.18842029571533,
+				"tag": {
+					"en": "dark",
+					"ko": "어두운"
+				}
+			},
+			{
+				"confidence": 9.00425624847412,
+				"tag": {
+					"en": "summer",
+					"ko": "여름"
+				}
+			},
+			{
+				"confidence": 8.90337944030762,
+				"tag": {
+					"en": "color",
+					"ko": "색"
+				}
+			},
+			{
+				"confidence": 8.61374092102051,
+				"tag": {
+					"en": "cloud",
+					"ko": "클라우드"
+				}
+			},
+			{
+				"confidence": 8.61374664306641,
+				"tag": {
+					"en": "faith",
+					"ko": "믿음"
+				}
+			},
+			{
+				"confidence": 8.60370922088623,
+				"tag": {
+					"en": "sea",
+					"ko": "바다"
+				}
+			},
+			{
+				"confidence": 8.60220623016357,
+				"tag": {
+					"en": "attraction",
+					"ko": "매력"
+				}
+			},
+			{
+				"confidence": 8.52257537841797,
+				"tag": {
+					"en": "onion",
+					"ko": "양파"
+				}
+			},
+			{
+				"confidence": 8.51210880279541,
+				"tag": {
+					"en": "winter",
+					"ko": "겨울"
+				}
+			},
+			{
+				"confidence": 8.38177299499512,
+				"tag": {
+					"en": "place",
+					"ko": "장소"
+				}
+			},
+			{
+				"confidence": 7.96279287338257,
+				"tag": {
+					"en": "decoration",
+					"ko": "장식"
+				}
+			},
+			{
+				"confidence": 7.88731336593628,
+				"tag": {
+					"en": "colorful",
+					"ko": "다채로운"
+				}
+			},
+			{
+				"confidence": 7.86863565444946,
+				"tag": {
+					"en": "urban",
+					"ko": "도시"
+				}
+			},
+			{
+				"confidence": 7.80250644683838,
+				"tag": {
+					"en": "high",
+					"ko": "높은"
+				}
+			},
+			{
+				"confidence": 7.72358894348145,
+				"tag": {
+					"en": "temple",
+					"ko": "사원"
+				}
+			},
+			{
+				"confidence": 7.71078729629517,
+				"tag": {
+					"en": "castle",
+					"ko": "성"
+				}
+			},
+			{
+				"confidence": 7.71014070510864,
+				"tag": {
+					"en": "moon",
+					"ko": "문"
+				}
+			},
+			{
+				"confidence": 7.69105291366577,
+				"tag": {
+					"en": "tree",
+					"ko": "트리"
+				}
+			},
+			{
+				"confidence": 7.6458535194397,
+				"tag": {
+					"en": "outdoor",
+					"ko": "야외"
+				}
+			},
+			{
+				"confidence": 7.47033739089966,
+				"tag": {
+					"en": "ocean",
+					"ko": "바다"
+				}
+			},
+			{
+				"confidence": 7.44099807739258,
+				"tag": {
+					"en": "landscape",
+					"ko": "조 경"
+				}
+			},
+			{
+				"confidence": 7.36682748794556,
+				"tag": {
+					"en": "vacation",
+					"ko": "휴가"
+				}
+			},
+			{
+				"confidence": 7.25250673294067,
+				"tag": {
+					"en": "tourist",
+					"ko": "관광"
+				}
+			},
+			{
+				"confidence": 7.15785455703735,
+				"tag": {
+					"en": "art",
+					"ko": "예술"
+				}
+			},
+			{
+				"confidence": 7.12374401092529,
+				"tag": {
+					"en": "sunlight",
+					"ko": "햇빛"
+				}
+			}
+		]
+	},
+	"status": {
+		"text": "",
+		"type": "success"
+	}
+}
