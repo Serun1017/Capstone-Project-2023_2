@@ -1,38 +1,30 @@
-from typing import Self
+from typing import final, Self
 import requests
 
 
+@final
 class RequestBuilder:
+    """## Example
+    ```py
+    request_builder = RequestBuilder.default()
+    ```
     """
-    ## Attributes
-    - languages: list[str]
-        List of [language codes](https://docs.imagga.com/#multi-language-support) to request.
-    """
+
+    __languages: list[str]
 
     def __init__(self, languages: list[str]):
         self.__languages = languages
 
-    @staticmethod
-    def default() -> Self:
-        """
-        Constructs `RequestBuilder` with default attribute values.
-
-        ## Default Attribute Values
-        - languages = ["en", "ko"]
-        """
-        return RequestBuilder(languages=["en", "ko"])
+    @classmethod
+    def default(cls) -> "RequestBuilder":
+        instance = cls(languages=["en", "ko"])
+        return instance
 
     def auth(self, auth_key: str, auth_secret: str) -> Self:
-        self.__auth
+        return self
 
     def request_tags(self, image: bytes):
-        """
-        ## Parameters
-        - image: bytes
-            Image data in bytes
-
-        ## Returns
-        """
+        """ """
         post_form = {"language": ",".join(self.__languages)}
         requests.post("https://api.imagga.com/v2/tags", data=post_form)
         pass

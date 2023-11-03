@@ -10,6 +10,8 @@ python = "^3.11"
 pdoc = "^14.1.0"
 toml = "^0.10.2"
 typing-extensions = "^4.8.0"
+requests = "^2.31.0"
+
 
 [build-system]
 requires = ["poetry-core"]
