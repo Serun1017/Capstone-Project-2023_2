@@ -1,17 +1,5 @@
 # Undefined Image Search
 
-## Config
-
-Requires `config.toml` at project root.
-
-`config.toml`:
-```sh
-# API details from [Imagga dashboard](https://imagga.com/profile/dashboard)
-[Imagga]
-key = "<Imagga API key>"
-secret = "<Imagga API secret>"
-```
-
 ## Code Style
 
 VSCode 확장 Ruff를 설치해서 자동으로 코드 정리하게 하자.
