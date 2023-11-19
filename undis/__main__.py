@@ -1,5 +1,6 @@
 from tkinter import Canvas
 import customtkinter
+import result_frame
 
 
 customtkinter.set_appearance_mode("system")
@@ -36,11 +37,19 @@ class App(customtkinter.CTk):
         super().__init__()
         self.title("undis")
         self.resizable(True, True)
+
+        self.workspace: str | None = None
+
         make_button(self)
 
         self.frame = ResultFrame(self)
         self.make_canvas()
         self.frame.pack()
+
+        image_button = result_frame.ImageButton(
+            self, "/home/toroidalfox/GoogleDrive/Pictures/background/Solstice.png"
+        )
+        image_button.pack()
 
     def make_canvas(self):
         self.canvas = Canvas(self, width=Width / 2, height=Height + 100, bg="black")
@@ -51,5 +60,5 @@ class App(customtkinter.CTk):
 
 
 app = App()
-app.geometry("1024x512")
+app.geometry("1024x768")
 app.mainloop()
