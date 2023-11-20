@@ -10,6 +10,7 @@ from asset import Asset
 
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("theme.json")
+customtkinter.deactivate_automatic_dpi_awareness()
 
 Width = 1024
 Height = 600

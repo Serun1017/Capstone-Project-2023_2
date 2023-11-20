@@ -1,7 +1,6 @@
 import os
 from itertools import cycle
 import tkinter as tk
-import customtkinter as ctk
 from PIL import Image, ImageTk
 
 import undis.util as util
@@ -9,55 +8,29 @@ from undis.asset import Asset
 import color
 
 
-class ResultFrame(ctk.CTkScrollableFrame):
+class ResultFrame(tk.Frame):
     def __init__(self, master, **kwargs):
-        super().__init__(master=master, fg_color=color.DARK_BACKGROUND, **kwargs)
+        super().__init__(master=master, bg=color.DARK_BACKGROUND, **kwargs)
 
         self.column_count = 0
         self.row_count = 0
         self.previous_size = (0, 0)
 
         self.image_buttons = [
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-hourglass-twins-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-timber-hearth-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-hourglass-twins-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-timber-hearth-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-hourglass-twins-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-timber-hearth-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-hourglass-twins-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-timber-hearth-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-hourglass-twins-4x.jpg",
-            ),
-            ImageButton(
-                self,
-                "/home/toroidalfox/GoogleDrive/Pictures/background/outer-wilds-landscape/clement-campargue-timber-hearth-4x.jpg",
-            ),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
+            ImageButton(self, "/home/toroidalfox/test.png"),
         ]
         # TODO test code
 
@@ -96,10 +69,7 @@ class ResultFrame(ctk.CTkScrollableFrame):
         actual_padx = max(
             0,
             (event.width - ImageButton.actual_width() * self.column_count)
-            / (self.column_count + 1),
-        )
-        print(
-            f"{event.width}, {ImageButton.actual_width()}, {event.width - ImageButton.actual_width() * self.column_count}"
+            / (self.column_count * 2),
         )
 
         row_index = 0
