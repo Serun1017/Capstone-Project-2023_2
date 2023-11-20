@@ -1,5 +1,5 @@
 import os
-from itertools import cycle
+from itertools import cycle, repeat
 import tkinter as tk
 import customtkinter as ctk
 from PIL import Image, ImageTk, ImageFilter
@@ -13,7 +13,9 @@ class ResultFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master=master, fg_color=color.DARK_BACKGROUND, **kwargs)
 
-        self.column_count = 1
+        self.column_count = 0
+        self.row_count = 0
+        self.previous_size = (0, 0)
 
         self.image_buttons = [
             ImageButton(
@@ -61,40 +63,68 @@ class ResultFrame(ctk.CTkScrollableFrame):
 
         self.bind(sequence="<Configure>", func=self.handler_resize)
 
+    def destroy(self):
+        super().destroy()
+
     def handler_resize(self, event):
-        self.column_count = int(event.width / 256)
-        for column_index in range(self.column_count):
-            self.grid_columnconfigure(index=column_index, minsize=256)
+        if (event.width, event.height) == self.previous_size:
+            return
+        else:
+            self.previous_size = (event.width, event.height)
+
+        images_count = len(self.image_buttons)
+        minimum_padx = 8
+
+        new_column_count = int((event.width - minimum_padx) / (256 + minimum_padx))
+        new_row_count = images_count // new_column_count
+
+        for column_index in range(self.column_count, new_column_count):
+            self.grid_columnconfigure(
+                column_index, minsize=ImageButton.image_max_dimension
+            )
+        for row_index in range(self.row_count, new_row_count):
+            self.grid_rowconfigure(
+                row_index, minsize=ImageButton.image_max_dimension + 32
+            )
+
+        self.column_count = new_column_count
+        self.row_count = new_row_count
+        self.configure(height=self.row_count * (ImageButton.image_max_dimension + 32))
+
+        actual_padx = (event.width - (256 + minimum_padx) * self.column_count) / (
+            self.column_count + 1
+        ) - 1
 
         row_index = 0
         for column_index, image_button in zip(
             cycle(range(self.column_count)), self.image_buttons
         ):
-            image_button.grid(column=column_index, row=row_index, padx=8, pady=8)
+            image_button.grid(
+                column=column_index, row=row_index, padx=actual_padx, pady=8
+            )
             if column_index == self.column_count - 1:
                 row_index += 1
-
-        pass
 
 
 class ImageButton(tk.Frame):
     image_max_dimension = 256
 
     def __init__(self, master, image_path: str, **kwargs):
-        super().__init__(master=master, **kwargs)
+        super().__init__(
+            master=master,
+            borderwidth=0,
+            **kwargs,
+        )
 
         self.image_path = image_path
         self.image_name = os.path.basename(os.path.splitext(image_path)[0])
 
-        self.unload_image()
-        self.image_loaded = False
-
-        # image = ctk.CTkLabel(self, image=self._image, text="")
-        # image.grid(row=0, column=0)
-        # utils.add_bindtag_to(bindtag_of=self, to=image)
-        self.image_preview = tk.Label(master=self, image=self._image)
-        self.image_preview.grid(row=0, column=0)
+        self.image_preview = tk.Label(master=self, padx=0, pady=0, borderwidth=0)
+        self.image_preview.grid(row=0, column=0, padx=0, pady=0)
         util.add_bindtag_to(bindtag_of=self, to=self.image_preview)
+
+        # call unload function to start from unloaded state
+        self.unload_image()
 
         self.image_name_text = tk.Label(
             master=self,
@@ -102,6 +132,7 @@ class ImageButton(tk.Frame):
             wraplength=256,
             justify="center",
             fg=color.LIGHT_TEXT,
+            borderwidth=0,
         )
         self.image_name_text.grid(row=1, column=0)
         util.add_bindtag_to(bindtag_of=self, to=self.image_name_text)
@@ -121,6 +152,9 @@ class ImageButton(tk.Frame):
         # call hover exit handler to set initial background color
         self.handler_hover_exit(None)
 
+    def destroy(self):
+        super().destroy()
+
     def load_image(self):
         image = Image.open(self.image_path)
         image.thumbnail(
@@ -133,6 +167,7 @@ class ImageButton(tk.Frame):
 
     def unload_image(self):
         self._image = ImageTk.PhotoImage(image=Asset.EMPTY_IMAGE)
+        self.image_preview.configure(image=self._image)
         self.image_loaded = False
 
     def open_file(self):
@@ -170,13 +205,15 @@ class ImageButton(tk.Frame):
         self.open_file()
 
     def handler_hover_enter(self, _):
-        for child in self.winfo_children():
-            child.configure(bg=color.DARK_BACKGROUND_HOVER)  # type: ignore
+        # for child in self.winfo_children():
+        #     child.configure(bg=color.DARK_BACKGROUND_HOVER)  # type: ignore
+        self.image_name_text.configure(bg=color.DARK_BACKGROUND_HOVER)
         self.configure(bg=color.DARK_BACKGROUND_HOVER)
 
     def handler_hover_exit(self, _):
-        for child in self.winfo_children():
-            child.configure(bg=color.DARK_BACKGROUND)  # type: ignore
+        # for child in self.winfo_children():
+        #     child.configure(bg=color.DARK_BACKGROUND)  # type: ignore
+        self.image_name_text.configure(bg=color.DARK_BACKGROUND)
         self.configure(bg=color.DARK_BACKGROUND)
 
 

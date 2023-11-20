@@ -61,3 +61,6 @@ class App(customtkinter.CTk):
 app = App()
 app.geometry("1024x600")
 app.mainloop()
+
+# tip
+# use dir() function to dump everything of object

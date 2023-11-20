@@ -27,12 +27,14 @@ class Visibility(Enum):
     FullyObscured = "VisibilityFullyObscured"
     """State when the widget is fully obscured."""
 
+    @staticmethod
     def is_state_visible(state) -> bool:
         if state == Visibility.FullyObscured:
             return False
         else:
             return True
 
+    @staticmethod
     def is_state_obsucured(state) -> bool:
         if state == Visibility.FullyObscured:
             return True
