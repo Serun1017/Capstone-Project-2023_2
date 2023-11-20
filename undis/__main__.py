@@ -1,9 +1,13 @@
+import tkinter
 from tkinter import Canvas
 import customtkinter
 import result_frame
+import color
 
 
-customtkinter.set_appearance_mode("system")
+customtkinter.set_appearance_mode("dark")
+customtkinter.set_default_color_theme("theme.json")
+customtkinter.set_window_scaling(1.5)
 
 Width = 1024
 Height = 512
@@ -27,29 +31,21 @@ def make_button(self):
     pass
 
 
-class ResultFrame(customtkinter.CTkScrollableFrame):
-    def __init__(self, master, **kwargs):
-        super().__init__(master=master, width=Width / 2, height=Height, **kwargs)  # type: ignore
-
-
 class App(customtkinter.CTk):
     def __init__(self):
-        super().__init__()
+        super().__init__(fg_color=color.DARK_BACKGROUND)
         self.title("undis")
         self.resizable(True, True)
+        self.minsize(512, 512)
 
         self.workspace: str | None = None
 
-        make_button(self)
+        # make_button(self)
 
-        self.frame = ResultFrame(self)
-        self.make_canvas()
-        self.frame.pack()
+        # self.make_canvas()
 
-        image_button = result_frame.ImageButton(
-            self, "/home/toroidalfox/GoogleDrive/Pictures/background/Solstice.png"
-        )
-        image_button.pack()
+        panel = result_frame.ResultFrame(master=self)
+        panel.pack(fill="both", expand=True)
 
     def make_canvas(self):
         self.canvas = Canvas(self, width=Width / 2, height=Height + 100, bg="black")
@@ -60,5 +56,5 @@ class App(customtkinter.CTk):
 
 
 app = App()
-app.geometry("1024x768")
+app.geometry("1024x600")
 app.mainloop()

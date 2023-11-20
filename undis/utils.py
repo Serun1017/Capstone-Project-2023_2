@@ -1,6 +1,7 @@
 import os
 import platform
 import subprocess
+import tkinter
 
 _detected_platform = platform.system()
 if _detected_platform == "Linux":
@@ -11,6 +12,12 @@ if _detected_platform == "Linux":
         .stdout.decode()
         .strip()
     )
+
+
+def add_bindtag_to(bindtag_of: tkinter.Misc, to: tkinter.Misc):
+    bindtags = list(to.bindtags())
+    bindtags.insert(1, bindtag_of.bindtags()[0])
+    to.bindtags(tuple(bindtags))
 
 
 def file_open(path: str):
