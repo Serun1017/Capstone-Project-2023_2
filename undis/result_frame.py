@@ -1,8 +1,8 @@
 import os
-from itertools import cycle, repeat
+from itertools import cycle
 import tkinter as tk
 import customtkinter as ctk
-from PIL import Image, ImageTk, ImageFilter
+from PIL import Image, ImageTk
 
 import undis.util as util
 from undis.asset import Asset
@@ -75,25 +75,24 @@ class ResultFrame(ctk.CTkScrollableFrame):
         images_count = len(self.image_buttons)
         minimum_padx = 8
 
-        new_column_count = int((event.width - minimum_padx) / (256 + minimum_padx))
+        new_column_count = int(
+            (event.width - minimum_padx) / (ImageButton.actual_width() + minimum_padx)
+        )
         new_row_count = images_count // new_column_count
 
         for column_index in range(self.column_count, new_column_count):
-            self.grid_columnconfigure(
-                column_index, minsize=ImageButton.image_max_dimension
-            )
+            self.grid_columnconfigure(column_index, minsize=ImageButton.actual_width())
         for row_index in range(self.row_count, new_row_count):
-            self.grid_rowconfigure(
-                row_index, minsize=ImageButton.image_max_dimension + 32
-            )
+            self.grid_rowconfigure(row_index, minsize=ImageButton.actual_width() + 32)
 
         self.column_count = new_column_count
         self.row_count = new_row_count
-        self.configure(height=self.row_count * (ImageButton.image_max_dimension + 32))
+        self.configure(height=self.row_count * (ImageButton.actual_width() + 32))
 
-        actual_padx = (event.width - (256 + minimum_padx) * self.column_count) / (
+        actual_padx = (event.width - ImageButton.actual_width() * self.column_count) / (
             self.column_count + 1
-        ) - 1
+        )
+        print(f"{event.width}, {ImageButton.actual_width()}, {self.column_count}")
 
         row_index = 0
         for column_index, image_button in zip(
@@ -107,7 +106,12 @@ class ResultFrame(ctk.CTkScrollableFrame):
 
 
 class ImageButton(tk.Frame):
-    image_max_dimension = 256
+    __image_max_dimension = 256
+    std_pad = 8
+
+    @staticmethod
+    def actual_width() -> int:
+        return ImageButton.__image_max_dimension + ImageButton.std_pad * 2
 
     def __init__(self, master, image_path: str, **kwargs):
         super().__init__(
@@ -120,7 +124,9 @@ class ImageButton(tk.Frame):
         self.image_name = os.path.basename(os.path.splitext(image_path)[0])
 
         self.image_preview = tk.Label(master=self, padx=0, pady=0, borderwidth=0)
-        self.image_preview.grid(row=0, column=0, padx=0, pady=0)
+        self.image_preview.grid(
+            row=0, column=0, padx=ImageButton.std_pad, pady=ImageButton.std_pad
+        )
         util.add_bindtag_to(bindtag_of=self, to=self.image_preview)
 
         # call unload function to start from unloaded state
@@ -129,12 +135,15 @@ class ImageButton(tk.Frame):
         self.image_name_text = tk.Label(
             master=self,
             text=self.image_name,
-            wraplength=256,
+            wraplength=ImageButton.__image_max_dimension,
             justify="center",
             fg=color.LIGHT_TEXT,
+            padx=8,
+            pady=8,
             borderwidth=0,
         )
-        self.image_name_text.grid(row=1, column=0)
+        self.image_name_text.grid(row=1, column=0, sticky=tk.N + tk.S)
+        self.grid_rowconfigure(1, weight=1)
         util.add_bindtag_to(bindtag_of=self, to=self.image_name_text)
 
         # visibility event
@@ -158,7 +167,7 @@ class ImageButton(tk.Frame):
     def load_image(self):
         image = Image.open(self.image_path)
         image.thumbnail(
-            size=(self.image_max_dimension, self.image_max_dimension),
+            size=(self.__image_max_dimension, self.__image_max_dimension),
             resample=Image.BILINEAR,
         )
         self._image = ImageTk.PhotoImage(image=image, size=image.size)
@@ -197,7 +206,6 @@ class ImageButton(tk.Frame):
             self.unload_image()
 
     def handler_resize(self, event):
-        print(f"resize of {self.image_name[-12:-1]}: {event.width}, {event.height}")
         # TODO implement
         pass
 
@@ -205,15 +213,13 @@ class ImageButton(tk.Frame):
         self.open_file()
 
     def handler_hover_enter(self, _):
-        # for child in self.winfo_children():
-        #     child.configure(bg=color.DARK_BACKGROUND_HOVER)  # type: ignore
-        self.image_name_text.configure(bg=color.DARK_BACKGROUND_HOVER)
+        for child in self.winfo_children():
+            child.configure(bg=color.DARK_BACKGROUND_HOVER)  # type: ignore
         self.configure(bg=color.DARK_BACKGROUND_HOVER)
 
     def handler_hover_exit(self, _):
-        # for child in self.winfo_children():
-        #     child.configure(bg=color.DARK_BACKGROUND)  # type: ignore
-        self.image_name_text.configure(bg=color.DARK_BACKGROUND)
+        for child in self.winfo_children():
+            child.configure(bg=color.DARK_BACKGROUND)  # type: ignore
         self.configure(bg=color.DARK_BACKGROUND)
 
 
