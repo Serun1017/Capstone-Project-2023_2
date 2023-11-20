@@ -10,7 +10,6 @@ from undis.asset import Asset
 
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("theme.json")
-customtkinter.set_window_scaling(1.5)
 
 Width = 1024
 Height = 600
@@ -76,8 +75,6 @@ class App(tk.Tk):
 
         Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
         Canvas_layer.pack(side="left", fill="both")
-        Canvas_layer.bind("<Button-1>", Canvas_layer.get_x_and_y)
-        Canvas_layer.bind("<B1-Motion>", Canvas_layer.draw_some)
 
     def open_workspace(self):
         self.workspace = filedialog.askdirectory()
@@ -87,25 +84,8 @@ class App(tk.Tk):
             return
 
         # menu
-        menu_bar = tk.Menu(
-            self,
-            bg=color.DARK_BACKGROUND_HIGHLIGHT,
-            fg=color.LIGHT_TEXT,
-            borderwidth=0,
-            activebackground=color.DARK_BACKGROUND_HOVER,
-            activeforeground=color.LIGHT_TEXT,
-            activeborderwidth=0,
-        )
-        file_menu = tk.Menu(
-            self,
-            tearoff=False,
-            bg=color.DARK_BACKGROUND_HIGHLIGHT,
-            fg=color.LIGHT_TEXT,
-            borderwidth=0,
-            activebackground=color.DARK_BACKGROUND_HOVER,
-            activeforeground=color.LIGHT_TEXT,
-            activeborderwidth=0,
-        )
+        menu_bar = tk.Menu(self)
+        file_menu = tk.Menu(self, tearoff=False)
 
         # menu_bar
         menu_bar.add_cascade(label="File", menu=file_menu)
