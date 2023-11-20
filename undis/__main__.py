@@ -2,6 +2,7 @@ import tkinter
 from tkinter import Canvas
 import customtkinter
 import result_frame
+import draw_canvas
 
 import undis.color as color
 from undis.asset import Asset
@@ -13,7 +14,7 @@ customtkinter.set_default_color_theme("theme.json")
 customtkinter.set_window_scaling(1.5)
 
 Width = 1024
-Height = 512
+Height = 600
 
 
 def test_callback():
@@ -43,19 +44,13 @@ class App(customtkinter.CTk):
 
         self.workspace: str | None = None
 
-        # make_button(self)
-
-        # self.make_canvas()
-
         panel = result_frame.ResultFrame(master=self)
-        panel.pack(fill="both", expand=True)
+        panel.pack(side="right", fill="both", expand=True)
 
-    def make_canvas(self):
-        self.canvas = Canvas(self, width=Width / 2, height=Height + 100, bg="black")
-        self.canvas.pack(
-            side="left",
-            fill="none",
-        )
+        Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
+        Canvas_layer.pack(side="left", fill="both")
+        Canvas_layer.bind("<Button-1>", Canvas_layer.get_x_and_y)
+        Canvas_layer.bind("<B1-Motion>", Canvas_layer.draw_some)
 
 
 app = App()
