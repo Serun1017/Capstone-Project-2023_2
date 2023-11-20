@@ -1,6 +1,9 @@
 import os
 import platform
 import subprocess
+
+from enum import Enum
+
 import tkinter
 
 _detected_platform = platform.system()
@@ -14,6 +17,29 @@ if _detected_platform == "Linux":
     )
 
 
+class Visibility(Enum):
+    """Visibility states of a widget. Can be acquired with `event.state` when binding to the `<Visibility>`."""
+
+    FullyVisible = "VisibilityUnobscured"
+    """State when the widget is fully visible."""
+    Partial = "VisibilityPartiallyObscured"
+    """State when the widget is partially visible and partially obscured."""
+    FullyObscured = "VisibilityFullyObscured"
+    """State when the widget is fully obscured."""
+
+    def is_state_visible(state) -> bool:
+        if state == Visibility.FullyObscured:
+            return False
+        else:
+            return True
+
+    def is_state_obsucured(state) -> bool:
+        if state == Visibility.FullyObscured:
+            return True
+        else:
+            return False
+
+
 def add_bindtag_to(bindtag_of: tkinter.Misc, to: tkinter.Misc):
     bindtags = list(to.bindtags())
     bindtags.insert(1, bindtag_of.bindtags()[0])
@@ -23,7 +49,7 @@ def add_bindtag_to(bindtag_of: tkinter.Misc, to: tkinter.Misc):
 def file_open(path: str):
     """Open a file in the default application for its type."""
     if _detected_platform == "Windows":
-        os.startfile(path)
+        os.startfile(path)  # type: ignore
     elif _detected_platform == "Linux":
         subprocess.call(("xdg-open", path))
     elif _detected_platform == "Darwin":

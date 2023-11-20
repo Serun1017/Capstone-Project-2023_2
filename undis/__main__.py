@@ -2,7 +2,10 @@ import tkinter
 from tkinter import Canvas
 import customtkinter
 import result_frame
-import color
+
+import undis.color as color
+from undis.asset import Asset
+import undis.asset as asset
 
 
 customtkinter.set_appearance_mode("dark")
