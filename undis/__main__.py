@@ -4,8 +4,8 @@ import customtkinter
 import result_frame
 import draw_canvas
 
-import undis.color as color
-from undis.asset import Asset
+import color
+from asset import Asset
 
 
 customtkinter.set_appearance_mode("dark")
@@ -96,6 +96,7 @@ class App(tk.Tk):
         file_menu.add_command(label="Exit", command=self.destroy)
 
         self.configure(menu=menu_bar)
+        self._menu_constructed = True
 
 
 app = App()

@@ -75,8 +75,12 @@ class ResultFrame(ctk.CTkScrollableFrame):
         images_count = len(self.image_buttons)
         minimum_padx = 8
 
-        new_column_count = int(
-            (event.width - minimum_padx) / (ImageButton.actual_width() + minimum_padx)
+        new_column_count = max(
+            1,
+            int(
+                (event.width - minimum_padx)
+                / (ImageButton.actual_width() + minimum_padx)
+            ),
         )
         new_row_count = images_count // new_column_count
 
@@ -89,10 +93,14 @@ class ResultFrame(ctk.CTkScrollableFrame):
         self.row_count = new_row_count
         self.configure(height=self.row_count * (ImageButton.actual_width() + 32))
 
-        actual_padx = (event.width - ImageButton.actual_width() * self.column_count) / (
-            self.column_count + 1
+        actual_padx = max(
+            0,
+            (event.width - ImageButton.actual_width() * self.column_count)
+            / (self.column_count + 1),
         )
-        print(f"{event.width}, {ImageButton.actual_width()}, {self.column_count}")
+        print(
+            f"{event.width}, {ImageButton.actual_width()}, {event.width - ImageButton.actual_width() * self.column_count}"
+        )
 
         row_index = 0
         for column_index, image_button in zip(
@@ -148,8 +156,6 @@ class ImageButton(tk.Frame):
 
         # visibility event
         self.bind(sequence="<Visibility>", func=self.handler_visibility)
-        # resize event
-        self.bind(sequence="<Configure>", func=self.handler_resize)
         # right click to open menu
         self.bind(sequence="<Button-3>", func=self.open_menu)
         # double click to open file
@@ -186,7 +192,7 @@ class ImageButton(tk.Frame):
         util.file_open_in_explorer(self.image_path)
 
     def open_menu(self, event):
-        menu = tk.Menu(self, tearoff=0, bg=color.DARK_BACKGROUND, fg=color.LIGHT_TEXT)
+        menu = tk.Menu(tearoff=0)
         menu.config
         menu.add_command(
             label="Open File", command=lambda: util.file_open(self.image_path)
@@ -205,10 +211,6 @@ class ImageButton(tk.Frame):
         ):
             self.unload_image()
 
-    def handler_resize(self, event):
-        # TODO implement
-        pass
-
     def handler_double_click(self, _):
         self.open_file()
 
@@ -221,25 +223,3 @@ class ImageButton(tk.Frame):
         for child in self.winfo_children():
             child.configure(bg=color.DARK_BACKGROUND)  # type: ignore
         self.configure(bg=color.DARK_BACKGROUND)
-
-
-# def image_resize(image: Image.Image, max_dimension: int) -> None:
-#     """Resize an image to a max dimension while maintaining aspect ratio."""
-#     width, height = image.size
-#     aspect_ratio = width / height
-#     if aspect_ratio > 1:
-#         if width > max_dimension:
-#             width = max_dimension
-#             height = int(width / aspect_ratio)
-#             return image.thumbnail(size=(width, height), resample=Image.BILINEAR)
-#         else:
-#             return image
-#     elif height > max_dimension:
-#         if height > max_dimension:
-#             height = max_dimension
-#             width = int(height * aspect_ratio)
-#             return image.resize(size=(width, height))
-#         else:
-#             return image
-#     else:
-#         return image
