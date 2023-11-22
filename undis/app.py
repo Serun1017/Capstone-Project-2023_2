@@ -19,7 +19,7 @@ class App(tk.Tk):
         self.menu_construct()
 
         panel = result_frame.ResultFrame(master=self)
-        panel.pack(side="right", fill="both", expand=True)
+        panel.pack(fill="both", expand=True)
 
         # Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
         # Canvas_layer.pack(side="left", fill="both")

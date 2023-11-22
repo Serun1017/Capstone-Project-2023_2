@@ -1,7 +1,8 @@
 import os
 from itertools import cycle
+import asyncio
 import tkinter as tk
-from tkinter import ttk
+import customtkinter as ctk
 from PIL import Image, ImageTk
 
 import undis.util as util
@@ -32,28 +33,27 @@ class ResultFrame(tk.Canvas):
 
     def handler_hover_enter(self, event):
         if util.Platform.detected() == util.Platform.Windows:
-            self.winfo_toplevel().bind_all(sequence="<MouseWheel>", func=self.handler_mouse_wheel_windows)
+            self.bind_all(sequence="<MouseWheel>", func=self.handler_mouse_wheel_windows)
         elif util.Platform.detected() == util.Platform.Linux:
-            self.winfo_toplevel().bind_all(sequence="<Button-4>", func=self.handler_mouse_wheel_linux)
-            self.winfo_toplevel().bind_all(sequence="<Button-5>", func=self.handler_mouse_wheel_linux)
+            self.bind_all(sequence="<Button-4>", func=self.handler_mouse_wheel_linux)
+            self.bind_all(sequence="<Button-5>", func=self.handler_mouse_wheel_linux)
         elif util.Platform.detected() == util.Platform.MacOS:
-            self.winfo_toplevel().bind_all(sequence="<MouseWheel>", func=self.handler_mouse_wheel_macos)
+            self.bind_all(sequence="<MouseWheel>", func=self.handler_mouse_wheel_macos)
 
     def handler_hover_exit(self, event):
         if util.Platform.detected() == util.Platform.Windows:
-            self.winfo_toplevel().unbind_all(sequence="<MouseWheel>")
+            self.unbind_all(sequence="<MouseWheel>")
         elif util.Platform.detected() == util.Platform.Linux:
-            self.winfo_toplevel().unbind_all(sequence="<Button-4>")
-            self.winfo_toplevel().unbind_all(sequence="<Button-5>")
+            self.unbind_all(sequence="<Button-4>")
+            self.unbind_all(sequence="<Button-5>")
         elif util.Platform.detected() == util.Platform.MacOS:
-            self.winfo_toplevel().unbind_all(sequence="<MouseWheel>")
+            self.unbind_all(sequence="<MouseWheel>")
 
     def handler_mouse_wheel_windows(self, event):
         self.yview_scroll(-1 * int(event.delta / 120), "units")
 
     def handler_mouse_wheel_macos(self, event):
         self.yview_scroll(int(event.delta), "units")
-        pass
 
     def handler_mouse_wheel_linux(self, event):
         print(dir(event))
@@ -61,7 +61,6 @@ class ResultFrame(tk.Canvas):
             self.yview_scroll(-1, "units")
         elif event.num == 5:
             self.yview_scroll(1, "units")
-        pass
 
 
 class InnerResultFrame(tk.Frame):
@@ -160,12 +159,12 @@ class InnerResultFrame(tk.Frame):
 
 
 class ImageButton(tk.Frame):
-    __image_max_dimension = 256
+    IMAGE_MAX_DIMENSION = 256
     std_pad = 8
 
     @staticmethod
     def actual_width() -> int:
-        return ImageButton.__image_max_dimension + ImageButton.std_pad * 2
+        return ImageButton.IMAGE_MAX_DIMENSION + ImageButton.std_pad * 2
 
     def __init__(self, master, image_path: str, **kwargs):
         super().__init__(
@@ -187,7 +186,7 @@ class ImageButton(tk.Frame):
         self.image_name_text = tk.Label(
             master=self,
             text=self.image_name,
-            wraplength=ImageButton.__image_max_dimension,
+            wraplength=ImageButton.IMAGE_MAX_DIMENSION,
             justify="center",
             fg=color.LIGHT_TEXT,
             padx=8,
@@ -215,12 +214,15 @@ class ImageButton(tk.Frame):
         super().destroy()
 
     def load_image(self):
-        image = Image.open(self.image_path)
-        image.thumbnail(
-            size=(self.__image_max_dimension, self.__image_max_dimension),
-            resample=Image.BILINEAR,
-        )
-        self._image = ImageTk.PhotoImage(image=image, size=image.size)
+        try:
+            image = Image.open(self.image_path)
+            image.thumbnail(
+                size=(self.IMAGE_MAX_DIMENSION, self.IMAGE_MAX_DIMENSION),
+                resample=Image.BILINEAR,
+            )
+        except Exception as _:
+            image = Asset.MISSING_IMAGE
+        self._image = ImageTk.PhotoImage(image=image, size=strecth_image_size(image.size))
         self.image_preview.configure(image=self._image)
         self.image_loaded = True
 
@@ -263,3 +265,13 @@ class ImageButton(tk.Frame):
         for child in self.winfo_children():
             child.configure(bg=color.DARK_BACKGROUND)  # type: ignore
         self.configure(bg=color.DARK_BACKGROUND)
+
+
+def strecth_image_size(size: tuple[int, int]) -> tuple[int, int]:
+    width, height = size[0], size[1]
+    max_dim = ImageButton.IMAGE_MAX_DIMENSION
+    aspect_ratio = width / height
+    if aspect_ratio > 1:
+        return (int(max_dim * aspect_ratio), max_dim)
+    else:
+        return (max_dim, int(max_dim / aspect_ratio))
