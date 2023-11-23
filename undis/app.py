@@ -4,6 +4,14 @@ from tkinter import filedialog
 import color
 import result_frame
 
+import os
+from os import listdir
+
+import draw_canvas
+
+Width = 600
+Height = 600
+
 
 class App(tk.Tk):
     def __init__(self):
@@ -18,14 +26,19 @@ class App(tk.Tk):
 
         self.menu_construct()
 
-        panel = result_frame.ResultFrame(master=self)
-        panel.pack(fill="both", expand=True)
+        self.panel = result_frame.ResultFrame(master=self)
 
+        self.panel.pack(side="right", fill="both", expand=True)
         # Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
         # Canvas_layer.pack(side="left", fill="both")
 
     def open_workspace(self):
         self.workspace = filedialog.askdirectory()
+        temp_workspace = self.workspace
+        for images in os.listdir(self.workspace):
+            if images.endswith(".png") or images.endswith(".jpg") or images.endswith(".jepg"):
+                self.workspace = temp_workspace + "/" + images
+                self.panel.get__panel().add_image(self.workspace)
 
     def menu_construct(self):
         if getattr(self, "_menu_constructed", False) is True:

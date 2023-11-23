@@ -2,6 +2,7 @@ import os
 from itertools import cycle
 import asyncio
 import tkinter as tk
+from typing import Any
 import customtkinter as ctk
 from PIL import Image, ImageTk
 
@@ -16,6 +17,7 @@ class ResultFrame(tk.Canvas):
 
         self.__scroll_bar = tk.Scrollbar(master=master, orient=tk.VERTICAL, command=self.yview)
         self.__panel = InnerResultFrame(master=self)
+
         self.configure(yscrollcommand=self.__scroll_bar.set)
 
         self.__scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -25,6 +27,9 @@ class ResultFrame(tk.Canvas):
         self.bind(sequence="<Configure>", func=self.handler_resize)
         self.bind(sequence="<Enter>", func=self.handler_hover_enter)
         self.bind(sequence="<Leave>", func=self.handler_hover_exit)
+
+    def get__panel(self):
+        return self.__panel
 
     def handler_resize(self, event):
         self.configure(scrollregion=self.bbox(tk.ALL))
@@ -70,26 +75,31 @@ class InnerResultFrame(tk.Frame):
         self.column_count = 0
         self.row_count = 0
         self.__previous_width = 0
+        self.image_buttons = []
+        # self.image_buttons = [
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        #     ImageButton(self, "/home/toroidalfox/test.png"),
+        # ]
 
-        self.image_buttons = [
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-            ImageButton(self, "/home/toroidalfox/test.png"),
-        ]
         # TODO test code
 
         # self.bind(sequence="<Configure>", func=self.handler_resize)
+
+    def add_image(self, workspace):
+        self.image_buttons.append(ImageButton(self, workspace))
+        pass
 
     def destroy(self):
         super().destroy()
@@ -181,7 +191,8 @@ class ImageButton(tk.Frame):
         util.add_bindtag_to(bindtag_of=self, to=self.image_preview)
 
         # call unload function to start from unloaded state
-        self.unload_image()
+        ##self.unload_image()
+        self.load_image()
 
         self.image_name_text = tk.Label(
             master=self,
@@ -206,9 +217,17 @@ class ImageButton(tk.Frame):
         # hover
         self.bind(sequence="<Enter>", func=self.handler_hover_enter)
         self.bind(sequence="<Leave>", func=self.handler_hover_exit)
+        self.bind(sequence="<Visibility>", func=self.visibility_test)
 
         # call hover exit handler to set initial background color
         self.handler_hover_exit(None)
+
+    def visibility_test(self, event):
+        if util.Visibility.is_state_visible(event.state):
+            # print("visible")
+            pass
+        elif util.Visibility.is_state_obsucured(event.state):
+            print("obscured")
 
     def destroy(self):
         super().destroy()
@@ -249,8 +268,10 @@ class ImageButton(tk.Frame):
 
     def handler_visibility(self, event):
         if self.image_loaded is False and util.Visibility.is_state_visible(event.state):
+            print("uploaded")
             self.load_image()
         elif self.image_loaded is True and util.Visibility.is_state_obsucured(event.state):
+            print("unuploaded")
             self.unload_image()
 
     def handler_double_click(self, _):

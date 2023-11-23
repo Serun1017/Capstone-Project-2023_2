@@ -16,5 +16,8 @@ class Asset:
             pass
         try:
             Asset.MISSING_IMAGE = Image.open("assets/Missing-Image.png")
-        finally:
+        except Exception as _:
             pass
+
+
+Asset.init()
