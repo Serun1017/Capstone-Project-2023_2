@@ -1,4 +1,6 @@
 import tkinter
+from PIL import Image
+import numpy as np
 
 
 class DrawCanvas(tkinter.Canvas):
@@ -24,9 +26,7 @@ class DrawCanvas(tkinter.Canvas):
 
     def draw_some(self, event):
         global lasx, lasy
-        self.create_line(
-            (lasx, lasy, event.x, event.y), fill="black", width=self.brush_width
-        )
+        self.create_line((lasx, lasy, event.x, event.y), fill="black", width=self.brush_width)
         self.create_oval(
             event.x - self.brush_tip_radius,
             event.y - self.brush_tip_radius,
@@ -35,3 +35,12 @@ class DrawCanvas(tkinter.Canvas):
             fill="black",
         )
         lasx, lasy = event.x, event.y
+
+    def clear(self):
+        self.delete("all")
+
+    def save(self):
+        self.postscript(file="image")
+        img = Image.open("image")
+        img2 = np.array(img)
+        print(img2)

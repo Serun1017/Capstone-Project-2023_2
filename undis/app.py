@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+import customtkinter
 
 import color
 import result_frame
@@ -29,16 +30,19 @@ class App(tk.Tk):
         self.panel = result_frame.ResultFrame(master=self)
 
         self.panel.pack(side="right", fill="both", expand=True)
-        Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
-        Canvas_layer.pack(side="left", fill="both")
+        self.Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
+        self.Canvas_layer.pack(fill="both")
+
+        self.clear_button()
+        self.save_button()
 
     def open_workspace(self):
         self.image_routes = []
         self.workspace = filedialog.askdirectory()
-        temp_workspace = self.workspace
+        self.temp_workspace = self.workspace
         for images in os.listdir(self.workspace):
             if images.endswith(".png") or images.endswith(".jpg") or images.endswith(".jepg"):
-                self.workspace = temp_workspace + "/" + images
+                self.workspace = self.temp_workspace + "/" + images
                 self.image_routes.append(self.workspace)
                 self.panel.get__panel().add_image(self.workspace)
 
@@ -60,3 +64,13 @@ class App(tk.Tk):
 
         self.configure(menu=menu_bar)
         self._menu_constructed = True
+
+    def clear_button(self):
+        self.playbutton = customtkinter.CTkButton(self, text="clear", command=self.Canvas_layer.clear)
+        self.playbutton.place(x=50)
+        self.playbutton.pack(side="left", anchor="nw")
+
+    def save_button(self):
+        self.playbutton = customtkinter.CTkButton(self, text="save", command=self.Canvas_layer.save)
+        self.playbutton.place(x=80)
+        self.playbutton.pack(side="left", anchor="nw")
