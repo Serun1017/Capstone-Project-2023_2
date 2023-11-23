@@ -8,24 +8,21 @@ MIN_NUM_PATCHES = 16
 
 
 class MultiHeadDotProductAttention(nn.Module):
-    def __init__(self, dim, heads=8, dropout=0.):
+    def __init__(self, dim, heads=8, dropout=0.0):
         super().__init__()
         self.heads = heads
         self.scale = (dim / heads) ** -0.5
 
         self.to_qkv = nn.Linear(dim, dim * 3)
 
-        self.to_out = nn.Sequential(
-            nn.Linear(dim, dim),
-            nn.Dropout(dropout)
-        )
+        self.to_out = nn.Sequential(nn.Linear(dim, dim), nn.Dropout(dropout))
 
     def forward(self, x, keep_rate, mask=None):
         b, n, c, h = *x.shape, self.heads
         qkv = self.to_qkv(x).chunk(3, dim=-1)
-        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=h), qkv)
+        q, k, v = map(lambda t: rearrange(t, "b n (h d) -> b h n d", h=h), qkv)
 
-        dots = torch.einsum('bhid,bhjd->bhij', q, k) * self.scale
+        dots = torch.einsum("bhid,bhjd->bhij", q, k) * self.scale
 
         # if mask is not None:
         #     mask = F.pad(mask.flatten(1), (1, 0), value=True)
@@ -36,12 +33,12 @@ class MultiHeadDotProductAttention(nn.Module):
 
         attn = dots.softmax(dim=-1)
 
-        out = torch.einsum('bhij,bhjd->bhid', attn, v)
-        out = rearrange(out, 'b h n d -> b n (h d)')
+        out = torch.einsum("bhij,bhjd->bhid", attn, v)
+        out = rearrange(out, "b h n d -> b n (h d)")
         out = self.to_out(out)
 
         # EVIT
-        left_tokens = n-1
+        left_tokens = n - 1
         if keep_rate < 1:
             left_tokens = math.ceil(keep_rate * left_tokens)
             cls_attn = attn[:, :, 0, 1:]  # [B, H, N-1]
@@ -56,14 +53,10 @@ class MultiHeadDotProductAttention(nn.Module):
 
 
 class FeedForward(nn.Module):
-    def __init__(self, dim, hidden_dim, dropout=0.):
+    def __init__(self, dim, hidden_dim, dropout=0.0):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(dim, hidden_dim),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, dim),
-            nn.Dropout(dropout)
+            nn.Linear(dim, hidden_dim), nn.GELU(), nn.Dropout(dropout), nn.Linear(hidden_dim, dim), nn.Dropout(dropout)
         )
 
     def forward(self, x):
@@ -71,8 +64,16 @@ class FeedForward(nn.Module):
 
 
 class Encoder1DBlock(nn.Module):
-    def __init__(self, input_shape, heads, mlp_dim, dtype=torch.float32, dropout_rate=0.1, attention_dropout_rate=0.1,
-                 deterministic=True):
+    def __init__(
+        self,
+        input_shape,
+        heads,
+        mlp_dim,
+        dtype=torch.float32,
+        dropout_rate=0.1,
+        attention_dropout_rate=0.1,
+        deterministic=True,
+    ):
         super().__init__()
         self.mlp_dim = mlp_dim
         self.dtype = dtype
@@ -96,8 +97,8 @@ class Encoder1DBlock(nn.Module):
         if index is not None:
             # B, N, C = x.shape
             non_cls = x[:, 1:]
-            x_others = torch.gather(non_cls, dim=1, index=index)    # [B, left_tokens, C]
-            x = torch.cat([x[:, 0:1], x_others], dim=1)     # [B, N+1, C] ->  [B, left_tokens+1, C]
+            x_others = torch.gather(non_cls, dim=1, index=index)  # [B, left_tokens, C]
+            x = torch.cat([x[:, 0:1], x_others], dim=1)  # [B, N+1, C] ->  [B, left_tokens+1, C]
 
         y = self.layer_norm_out(x)
         y = self.mlp(y)
@@ -117,7 +118,7 @@ class Encoder(nn.Module):
         for _ in range(num_layers):
             self.layers.append(nn.ModuleList([Encoder1DBlock(input_shape, heads, mlp_dim)]))
 
-        self.keep_rate = (1, ) * 12
+        self.keep_rate = (1,) * 12
         # self.keep_rate = (1, 1, 1, 0.9) + (1, 1, 0.9) + (1, 1, 0.9) + (1, 1)    # 196 -> 177 -> 160 -> 144
 
     def forward(self, img, mask=None):
@@ -134,12 +135,26 @@ class Encoder(nn.Module):
 
 
 class ViTPatch(nn.Module):
-    def __init__(self, *, image_size, patch_size, hidden_size, num_classes, depth, heads,
-                 mlp_dim, channels=3, dropout=0., emb_dropout=0.):
+    def __init__(
+        self,
+        *,
+        image_size,
+        patch_size,
+        hidden_size,
+        num_classes,
+        depth,
+        heads,
+        mlp_dim,
+        channels=3,
+        dropout=0.0,
+        emb_dropout=0.0,
+    ):
         super().__init__()
-        assert image_size % patch_size == 0, 'image dimensions must be divisible by the patch size'
+        assert image_size % patch_size == 0, "image dimensions must be divisible by the patch size"
         num_patches = (image_size // patch_size) ** 2
-        assert num_patches > MIN_NUM_PATCHES, f'your number of patches ({num_patches}) is way too small for attention to be effective. try decreasing your patch size'
+        assert (
+            num_patches > MIN_NUM_PATCHES
+        ), f"your number of patches ({num_patches}) is way too small for attention to be effective. try decreasing your patch size"
 
         self.patch_size = patch_size
         self.hidden_size = hidden_size
@@ -158,12 +173,12 @@ class ViTPatch(nn.Module):
         x2 = self.scale(img)
         x = (x1 + x2) / 2
 
-        x = rearrange(x, 'b c h w  -> b (h w) c')
+        x = rearrange(x, "b c h w  -> b (h w) c")
         b, n, _ = x.shape
 
-        cls_tokens = repeat(self.cls, '() n d -> b n d', b=b)
+        cls_tokens = repeat(self.cls, "() n d -> b n d", b=b)
         x = torch.cat((cls_tokens, x), dim=1)
-        x += self.pos_embedding[:, :(n + 1)]
+        x += self.pos_embedding[:, : (n + 1)]
         x = self.dropout(x)
         x, left_tokens, idxs = self.transformer(x)
 
@@ -185,16 +200,15 @@ class Self_Attention(nn.Module):
             heads=12,
             mlp_dim=3072,
             dropout=0.1,
-            emb_dropout=0.1
+            emb_dropout=0.1,
         )
         if pretrained:
-            checkpoint = torch.load("./model/sam_ViT-B_16.pth")
+            checkpoint = torch.load("./module/model/sam_ViT-B_16.pth")
             cur = self.model.state_dict()
-            new = {k: v for k, v in checkpoint.items() if k in cur.keys() and 'mlp_head' not in k}
+            new = {k: v for k, v in checkpoint.items() if k in cur.keys() and "mlp_head" not in k}
             cur.update(new)
             self.model.load_state_dict(cur)
 
     def forward(self, x):
         sa_fea, left_tokens, idxs = self.model(x)
         return sa_fea, left_tokens, idxs
-
