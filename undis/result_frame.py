@@ -36,7 +36,7 @@ class ResultFrame(tk.Canvas):
         self.__panel.configure(width=event.width - self.__scroll_bar.winfo_width())
         self.__panel.handler_resize_experimental(width=event.width - self.__scroll_bar.winfo_width())
 
-    def handler_hover_enter(self, event):
+    def handler_hover_enter(self, _):
         if util.Platform.detected() == util.Platform.Windows:
             self.bind_all(sequence="<MouseWheel>", func=self.handler_mouse_wheel_windows)
         elif util.Platform.detected() == util.Platform.Linux:
@@ -45,7 +45,7 @@ class ResultFrame(tk.Canvas):
         elif util.Platform.detected() == util.Platform.MacOS:
             self.bind_all(sequence="<MouseWheel>", func=self.handler_mouse_wheel_macos)
 
-    def handler_hover_exit(self, event):
+    def handler_hover_exit(self, _):
         if util.Platform.detected() == util.Platform.Windows:
             self.unbind_all(sequence="<MouseWheel>")
         elif util.Platform.detected() == util.Platform.Linux:
@@ -61,7 +61,6 @@ class ResultFrame(tk.Canvas):
         self.yview_scroll(int(event.delta), "units")
 
     def handler_mouse_wheel_linux(self, event):
-        print(dir(event))
         if event.num == 4:
             self.yview_scroll(-1, "units")
         elif event.num == 5:
@@ -75,6 +74,9 @@ class InnerResultFrame(tk.Frame):
         self.column_count = 0
         self.row_count = 0
         self.__previous_width = 0
+
+        self.workspace: str | None = None
+        self.list_of_images = []
         self.image_buttons = []
         # self.image_buttons = [
         #     ImageButton(self, "/home/toroidalfox/test.png"),
@@ -97,9 +99,22 @@ class InnerResultFrame(tk.Frame):
 
         # self.bind(sequence="<Configure>", func=self.handler_resize)
 
-    def add_image(self, workspace):
-        self.image_buttons.append(ImageButton(self, workspace))
-        pass
+    def update_workspace(self, workspace: str | None):
+        self.workspace = workspace
+        if self.workspace is None:
+            return
+
+        self.list_of_images = []
+        for button in self.image_buttons:
+            button.destroy()
+        self.image_buttons = []
+
+        for directory, subdirectories, files in os.walk(self.workspace):
+            for file in files:
+                if os.path.splitext(file)[1] in Asset.SUPPORTED_IMAGE_EXTENSIONS:
+                    full_file_path = os.path.join(directory, file)
+                    self.list_of_images.append(full_file_path)
+                    self.image_buttons.append(ImageButton(self, full_file_path))
 
     def destroy(self):
         super().destroy()
@@ -190,10 +205,6 @@ class ImageButton(tk.Frame):
         self.image_preview.grid(row=0, column=0, padx=ImageButton.std_pad, pady=ImageButton.std_pad)
         util.add_bindtag_to(bindtag_of=self, to=self.image_preview)
 
-        # call unload function to start from unloaded state
-        ##self.unload_image()
-        self.load_image()
-
         self.image_name_text = tk.Label(
             master=self,
             text=self.image_name,
@@ -207,6 +218,9 @@ class ImageButton(tk.Frame):
         self.image_name_text.grid(row=1, column=0, sticky=tk.N + tk.S)
         self.grid_rowconfigure(1, weight=1)
         util.add_bindtag_to(bindtag_of=self, to=self.image_name_text)
+
+        # call unload function to start from unloaded state
+        self.unload_image()
 
         # visibility event
         self.bind(sequence="<Visibility>", func=self.handler_visibility)

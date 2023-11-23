@@ -2,11 +2,11 @@ import tkinter as tk
 from tkinter import filedialog
 import customtkinter
 
+from asset import Asset
 import color
 import result_frame
 
 import os
-from os import listdir
 
 import draw_canvas
 
@@ -37,14 +37,8 @@ class App(tk.Tk):
         self.save_button()
 
     def open_workspace(self):
-        self.image_routes = []
         self.workspace = filedialog.askdirectory()
-        self.temp_workspace = self.workspace
-        for images in os.listdir(self.workspace):
-            if images.endswith(".png") or images.endswith(".jpg") or images.endswith(".jepg"):
-                self.workspace = self.temp_workspace + "/" + images
-                self.image_routes.append(self.workspace)
-                self.panel.get__panel().add_image(self.workspace)
+        self.panel.get__panel().update_workspace(self.workspace)
 
     def menu_construct(self):
         if getattr(self, "_menu_constructed", False) is True:
