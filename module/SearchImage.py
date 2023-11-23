@@ -4,7 +4,7 @@ import cv2
 from options import Option
 from ModelLoad import ModelLoader
 from SketchPreload import SketchLoader
-from ImagePreoload import ImageLoader
+from ImagePreload import ImageLoader
 # sk is tokenized sketch data.
 # im_dictionary is tokenized image data as dictionary
 def retrieveImage(model, sk, im_dictionary) :
@@ -22,8 +22,8 @@ def retrieveImage(model, sk, im_dictionary) :
         if i == 0 :
             dist_im = feature_2.view(1, len(keys)).cpu().data.numpy()  # 1*args.batch
         else :
-            dist_im = np.concatenate((dist_im, feature_2.view(1, len(keys)).cpu().data.numpy()), axis=1)
-    dist_im = np.squeeze(dist_im)
+            dist_im = np.concatenate((dist_im, feature_2.view(1, len(keys)).cpu().data.numpy()), axis=1) # type:ignore
+    dist_im = np.squeeze(dist_im) # type:ignore
 
     sorted_indices = np.argsort(dist_im)
     sorted_indices = sorted_indices[::-1]

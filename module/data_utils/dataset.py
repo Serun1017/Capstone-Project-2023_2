@@ -29,7 +29,7 @@ class ValidSet(data.Dataset):
         file_name = self.file_names[index]
         
         if self.half :
-            image = preprocess(file_name, self.type_skim).half()
+            image = preprocess(file_name, self.type_skim).half() # type: ignore
         else :
             image = preprocess(file_name, self.type_skim)
 

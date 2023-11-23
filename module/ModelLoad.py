@@ -15,7 +15,7 @@ class ModelLoader :
             checkpoint = load_checkpoint(args.load)
         
         cur = self.model.state_dict()
-        new = {k: v for k, v in checkpoint['model'].items() if k in cur.keys()}
+        new = {k: v for k, v in checkpoint['model'].items() if k in cur.keys()} # type:ignore
         cur.update(new)
         self.model.load_state_dict(cur)
 

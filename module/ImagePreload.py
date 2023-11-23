@@ -58,7 +58,7 @@ class ImageLoader() :
                     new_im_dictionary[im_label] = im
             
                 self.__UpdateImageDictionaryForcibly__(new_im_dictionary)
-                print(f"{im_label} has forcibly updated")
+                print(f"{im_label} has forcibly updated") # type:ignore
 
     def ISImageTokenized(self, im_path) :
         if isinstance(im_path, list) :

@@ -52,7 +52,7 @@ def remove_white_space_image(img_np: np.ndarray, padding: int):
     img_np_single = np.sum(img_np, axis=2)
     Y, X = np.where(img_np_single <= 300)  # max = 300
     ymin, ymax, xmin, xmax = np.min(Y), np.max(Y), np.min(X), np.max(X)
-    img_cropped = img_np[max(0, ymin - padding):min(h, ymax + padding), max(0, xmin - padding):min(w, xmax + padding),
+    img_cropped = img_np[max(0, ymin - padding):min(h, ymax + padding), max(0, xmin - padding):min(w, xmax + padding), # type: ignore
                   :]
     return img_cropped
 
@@ -72,8 +72,8 @@ def resize_image_by_ratio(img_np: np.ndarray, size: int):
     else:
         assert 0
 
-    ratio = h / w
-    if h > w:
+    ratio = h / w # type: ignore
+    if h > w: # type: ignore
         new_img = cv2.resize(img_np, (int(size / ratio), size,))  # resize is w, h  (fx, fy...)
     else:
         new_img = cv2.resize(img_np, (size, int(size * ratio),))
