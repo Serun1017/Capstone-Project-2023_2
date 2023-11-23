@@ -29,15 +29,17 @@ class App(tk.Tk):
         self.panel = result_frame.ResultFrame(master=self)
 
         self.panel.pack(side="right", fill="both", expand=True)
-        # Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
-        # Canvas_layer.pack(side="left", fill="both")
+        Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
+        Canvas_layer.pack(side="left", fill="both")
 
     def open_workspace(self):
+        self.image_routes = []
         self.workspace = filedialog.askdirectory()
         temp_workspace = self.workspace
         for images in os.listdir(self.workspace):
             if images.endswith(".png") or images.endswith(".jpg") or images.endswith(".jepg"):
                 self.workspace = temp_workspace + "/" + images
+                self.image_routes.append(self.workspace)
                 self.panel.get__panel().add_image(self.workspace)
 
     def menu_construct(self):
