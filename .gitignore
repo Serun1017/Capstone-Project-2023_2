@@ -4,3 +4,6 @@
 
 # config file
 config.toml
+
+.pth
+.pt
