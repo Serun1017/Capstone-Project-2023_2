@@ -35,6 +35,8 @@ class App(tk.Tk):
 
         self.clear_button()
         self.save_button()
+        self.erase_button()
+        self.pen_button()
 
     def open_workspace(self):
         retrieved_workspace = filedialog.askdirectory()
@@ -71,6 +73,13 @@ class App(tk.Tk):
         self.playbutton = customtkinter.CTkButton(self, text="save", command=self.Canvas_layer.save)
         self.playbutton.place(x=80)
         self.playbutton.pack(side="left", anchor="nw")
-        self.debugbutton = customtkinter.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
-        self.debugbutton.place(x=110)
-        self.debugbutton.pack(side="left", anchor="nw")
+
+    def erase_button(self):
+        self.playbutton = customtkinter.CTkButton(self, text="erase", command=self.Canvas_layer.bind_eraser)
+        self.playbutton.place(x=110)
+        self.playbutton.pack(side="left", anchor="nw")
+
+    def pen_button(self):
+        self.playbutton = customtkinter.CTkButton(self, text="pen", command=self.Canvas_layer.bind_pen)
+        self.playbutton.place(x=130)
+        self.playbutton.pack(side="left", anchor="nw")
