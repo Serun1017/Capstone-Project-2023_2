@@ -6,5 +6,5 @@
 config.toml
 
 image
-.pth
-.pt
+*.pth
+*.pt

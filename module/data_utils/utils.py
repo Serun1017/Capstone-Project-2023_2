@@ -1,5 +1,3 @@
-import os
-import time
 import numpy as np
 from PIL import Image
 from torchvision.transforms import transforms

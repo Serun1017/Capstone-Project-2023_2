@@ -10,6 +10,10 @@ import os
 
 import draw_canvas
 
+import threading
+from module.ModelLoad import ModelLoader
+from module.options import Option
+
 Width = 600
 Height = 600
 
@@ -33,6 +37,14 @@ class App(tk.Tk):
         self.Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
         self.Canvas_layer.pack(fill="both")
 
+        # 모델 로드 스레드 추가 및 실행
+        '''
+        self.thread = threading.Thread(target=self.load_module, args=())
+        self.thread.daemon = True
+        self.thread.start()
+        '''
+        self.load_module()
+        
         self.clear_button()
         self.save_button()
 
@@ -74,3 +86,8 @@ class App(tk.Tk):
         self.debugbutton = customtkinter.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
         self.debugbutton.place(x=110)
         self.debugbutton.pack(side="left", anchor="nw")
+
+    def load_module(self) :
+        self.model_option = Option().parse()
+        self.load_model = ModelLoader(self.model_option)
+

@@ -1,9 +1,8 @@
 import torch
 
-from options import Option
-from model.model import Model
+from .model.model import Model
 
-from utils.util import load_checkpoint
+from .utils.util import load_checkpoint
 
 class ModelLoader :
     def __init__(self, args) :
@@ -31,11 +30,3 @@ class ModelLoader :
 
     def __call__(self, sk, im, stage='train', only_sa=False) :
         return self.model(sk, im, stage, only_sa)
-    
-if __name__ == "__main__" :
-    args = Option().parse()
-    model = ModelLoader(args)
-    if model != None :
-        print("Model Loaded!")
-    else :
-        print("Model Not Loaded!")

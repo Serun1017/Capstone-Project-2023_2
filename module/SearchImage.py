@@ -1,10 +1,5 @@
 import numpy as np
-import cv2
 
-from options import Option
-from ModelLoad import ModelLoader
-from SketchPreload import SketchLoader
-from ImagePreload import ImageLoader
 # sk is tokenized sketch data.
 # im_dictionary is tokenized image data as dictionary
 def retrieveImage(model, sk, im_dictionary) :
@@ -33,40 +28,3 @@ def retrieveImage(model, sk, im_dictionary) :
 
     result = np.stack([dist_im, labels])
     return result
-
-if __name__ == "__main__" :
-    args = Option().parse()
-    model = ModelLoader(args)
-
-    ### Test Image Loaded to img
-    path = 'C:\\Users\\tjgh2\\OneDrive\\바탕 화면\\capstone\\Capstone Project\\datasets\\raster_sketches\\1\\000000006336.jpg'
-    image_path = np.fromfile(path, np.uint8)
-    img = cv2.imdecode(image_path, cv2.IMREAD_COLOR)
-
-    # Sketch Loader Load
-    sketch = SketchLoader(model, args)
-    sketch.LoadSketch(img)
-
-    # Image Data Load
-    im_path = 'C:\\Users\\tjgh2\\OneDrive\\바탕 화면\\capstone\\Capstone Project\\datasets\\images\\1' 
-    image_data = ImageLoader(model, im_path, args)
-
-    image_data.LoadImageToken()
-
-    # If you load the image, you must call SelfAttention() to tokenize the image
-    image_data.LoadImage()
-    image_data.SelfAttention()
-
-    # If you want to save the tokenized image, call SaveImageToken()
-    image_data.SaveImageToken()
-
-    # sk_data has tokenized sketch data, If you call LoadSketch()   
-    sk = sketch.sk_data
-    # im_dictionary has tokenized image data as dictionary, If you call LoadImageToken() or LoadImages() and SelfAttention()
-    im_dictionary = image_data.im_dictionary
-
-    # retrievaImage return the distance of sketch and image, labels of images
-    result = retrieveImage(model, sk, im_dictionary)
-
-    print(result[1])
-

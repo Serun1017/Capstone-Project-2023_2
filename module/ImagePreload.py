@@ -2,10 +2,8 @@ import torch
 import os
 import numpy as np
 
-from ModelLoad import ModelLoader
-from data_utils.dataset import ValidSet, ValidSeparately
+from .data_utils.dataset import ValidSet, ValidSeparately
 from torch.utils.data import DataLoader
-from options import Option
 
 class ImageLoader() :
     def __init__(self, model, im_path, args) :
@@ -143,33 +141,3 @@ class ImageLoader() :
                             new_image_index = keys.index(im_label)
 
                             self.im_dictionary[tokenized_image_keys][tokenized_image_index] = new_im_dictionary[keys][new_image_index]
-
-
-if __name__ == "__main__" :
-
-    args = Option().parse()
-    model = ModelLoader(args)
-
-    im_path = 'C:/Users/tjgh2/OneDrive/바탕 화면/capstone/Capstone Project/test_sketch/picture_3'
-    imagedata = ImageLoader(model, im_path, args)
-
-    imagedata.LoadImageToken()
-
-    imagedata.LoadImage()
-    imagedata.LoadImageToken()
-    imagedata.SelfAttention()
-    for keys in imagedata.im_dictionary.keys() :
-        tensor = imagedata.im_dictionary[keys]
-        print(keys)
-        print(tensor)
-
-    print(imagedata.im_tokenized_label)
-
-    # If image has aleardy tokenized but  you want to tokenized the image again, call LoadImageForcibly(im_path) as follows.
-    im_path_list = ['C:/Users/tjgh2/OneDrive/바탕 화면/capstone/Capstone Project/test_sketch/picture_3/case1.png']
-    print(imagedata.ISImageTokenized(im_path_list))
-    if imagedata.ISImageTokenized(im_path_list) :
-        imagedata.LoadImageForcibly(im_path_list)
-
-    
-    imagedata.SaveImageToken()
