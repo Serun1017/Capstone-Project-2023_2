@@ -4,12 +4,11 @@ import tkinter as tk
 import customtkinter as ctk
 from PIL import Image, ImageTk
 from concurrent.futures import Future
-import datetime
 
-import undis.util as util
-from undis.asset import Asset
-import color
-import image_loader
+from . import util
+from .asset import Asset
+from . import color
+from . import image_loader
 
 
 class ResultFrame(tk.Canvas):

@@ -1,17 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog
-import customtkinter
+import customtkinter as ctk
 
-from asset import Asset
-import color
-import result_frame
-
-import os
-
-import draw_canvas
-
-Width = 600
-Height = 600
+from . import color
+from . import result_frame
+from . import draw_canvas
 
 
 class App(tk.Tk):
@@ -30,7 +23,7 @@ class App(tk.Tk):
         self.panel = result_frame.ResultFrame(master=self)
 
         self.panel.pack(side="right", fill="both", expand=True)
-        self.Canvas_layer = draw_canvas.DrawCanvas(self, Width, Height)
+        self.Canvas_layer = draw_canvas.DrawCanvas(self, 512, 512)
         self.Canvas_layer.pack(fill="both")
 
         self.clear_button()
@@ -63,14 +56,14 @@ class App(tk.Tk):
         self._menu_constructed = True
 
     def clear_button(self):
-        self.playbutton = customtkinter.CTkButton(self, text="clear", command=self.Canvas_layer.clear)
+        self.playbutton = ctk.CTkButton(self, text="clear", command=self.Canvas_layer.clear)
         self.playbutton.place(x=50)
         self.playbutton.pack(side="left", anchor="nw")
 
     def save_button(self):
-        self.playbutton = customtkinter.CTkButton(self, text="save", command=self.Canvas_layer.save)
+        self.playbutton = ctk.CTkButton(self, text="save", command=self.Canvas_layer.save)
         self.playbutton.place(x=80)
         self.playbutton.pack(side="left", anchor="nw")
-        self.debugbutton = customtkinter.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
+        self.debugbutton = ctk.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
         self.debugbutton.place(x=110)
         self.debugbutton.pack(side="left", anchor="nw")
