@@ -71,3 +71,6 @@ class App(tk.Tk):
         self.playbutton = customtkinter.CTkButton(self, text="save", command=self.Canvas_layer.save)
         self.playbutton.place(x=80)
         self.playbutton.pack(side="left", anchor="nw")
+        self.debugbutton = customtkinter.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
+        self.debugbutton.place(x=110)
+        self.debugbutton.pack(side="left", anchor="nw")

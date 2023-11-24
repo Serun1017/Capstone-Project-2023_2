@@ -1,11 +1,10 @@
 import os
 from itertools import cycle
-import asyncio
 import tkinter as tk
-from typing import Any
 import customtkinter as ctk
 from PIL import Image, ImageTk
 from concurrent.futures import Future
+import datetime
 
 import undis.util as util
 from undis.asset import Asset
@@ -36,7 +35,7 @@ class ResultFrame(tk.Canvas):
     def handler_resize(self, event):
         self.configure(scrollregion=self.bbox(tk.ALL))
         self.__panel.configure(width=event.width - self.__scroll_bar.winfo_width())
-        self.__panel.handler_resize_experimental(width=event.width - self.__scroll_bar.winfo_width())
+        self.__panel.handler_resize_experimental(width=event.width - self.__scroll_bar.winfo_width(), master=self)
 
     def handler_hover_enter(self, _):
         if util.Platform.detected() == util.Platform.Windows:
@@ -81,8 +80,6 @@ class InnerResultFrame(tk.Frame):
         self.list_of_images = []
         self.image_buttons = []
 
-        # self.bind(sequence="<Configure>", func=self.handler_resize)
-
     def update_workspace(self, workspace: str | None):
         self.workspace = workspace
 
@@ -104,7 +101,7 @@ class InnerResultFrame(tk.Frame):
     def destroy(self):
         super().destroy()
 
-    def handler_resize_experimental(self, width):
+    def handler_resize_experimental(self, width, master):
         if width == self.__previous_width:
             return
         else:
@@ -119,9 +116,9 @@ class InnerResultFrame(tk.Frame):
         actual_padx = max(0, (width - ImageButton.actual_width() * new_column_count) / new_column_count)
 
         row_index = 0
-        for column_index, image_button in zip(cycle(range(self.column_count)), self.image_buttons):
+        for column_index, image_button in zip(cycle(range(new_column_count)), self.image_buttons):
             image_button.grid(column=column_index, row=row_index)
-            if column_index == self.column_count - 1:
+            if column_index == new_column_count - 1:
                 row_index += 1
 
         for column_index in range(new_column_count):
@@ -131,41 +128,11 @@ class InnerResultFrame(tk.Frame):
 
         self.column_count = new_column_count
         self.row_count = new_row_count
-
-    def handler_resize(self, event):
-        print(f"InnerFrame! {event.width}, {event.height}")
-        if event.width == self.__previous_width:
-            return
-        else:
-            self.__previous_width = event.width
-
-        images_count = len(self.image_buttons)
-        minimum_padx = 8
-
-        new_column_count = max(
-            1,
-            int((event.width - minimum_padx) / (ImageButton.actual_width() + minimum_padx)),
-        )
-        new_row_count = images_count // new_column_count
-
-        actual_padx = max(
-            0,
-            (event.width - ImageButton.actual_width() * new_column_count) / (new_column_count * 2),
-        )
-
-        row_index = 0
-        for column_index, image_button in zip(cycle(range(self.column_count)), self.image_buttons):
-            image_button.grid(column=column_index, row=row_index)
-            if column_index == self.column_count - 1:
-                row_index += 1
-
-        for column_index in range(self.column_count, new_column_count):
-            self.grid_columnconfigure(column_index, minsize=ImageButton.actual_width(), pad=actual_padx)
-        for row_index in range(self.row_count, new_row_count):
-            self.grid_rowconfigure(row_index, minsize=ImageButton.actual_width() + 32, pad=8)
-
-        self.column_count = new_column_count
-        self.row_count = new_row_count
+        self.configure(height=self.row_count * (ImageButton.actual_width() + 32) + (self.row_count + 1) * 8)
+        master.configure(scrollregion=master.bbox(tk.ALL))
+        # print(
+        #     f"height={self.row_count * (ImageButton.actual_width() + 32) + (self.row_count + 1) * 8}, bbox={master.bbox(tk.ALL)}"
+        # )
 
 
 class ImageButton(tk.Frame):
