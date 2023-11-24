@@ -88,3 +88,10 @@ def file_open_in_explorer(path: str):
             subprocess.call(["xdg-open", os.path.split(path)[0]])
     elif _detected_platform == Platform.MacOS:
         subprocess.call(["open", "-R", path])
+
+
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+
+
+def path_from_root(*paths: str | os.PathLike) -> str:
+    return os.path.join(_PROJECT_ROOT, "..", *paths)

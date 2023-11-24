@@ -1,5 +1,8 @@
+import os
 from PIL import Image
 from typing import final
+
+from . import util
 
 
 @final
@@ -12,11 +15,11 @@ class Asset:
     @staticmethod
     def init():
         try:
-            Asset.EMPTY_IMAGE = Image.open("assets/Empty-Image.png")
+            Asset.EMPTY_IMAGE = Image.open(util.path_from_root("assets", "Empty-Image.png"))
         except Exception as _:
             pass
         try:
-            Asset.MISSING_IMAGE = Image.open("assets/Missing-Image.png")
+            Asset.MISSING_IMAGE = Image.open(util.path_from_root("assets", "Missing-Image.png"))
         except Exception as _:
             pass
         supported_extensions = [
