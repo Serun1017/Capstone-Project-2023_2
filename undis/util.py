@@ -80,7 +80,7 @@ def file_open_in_explorer(path: str):
     """Open a default file explorer with file selected."""
     if _detected_platform == Platform.Windows:
         print(os.path.abspath(path))
-        subprocess.call(f'explorer, /select,"{os.path.abspath(path)}"')
+        subprocess.call(f'explorer /select,"{os.path.abspath(path)}"')
     elif _detected_platform == Platform.Linux:
         if _linux_file_explorer == "org.kde.dolphin.desktop":
             subprocess.call(["dolphin", "--select", path])
