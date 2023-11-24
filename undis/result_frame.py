@@ -5,10 +5,12 @@ import tkinter as tk
 from typing import Any
 import customtkinter as ctk
 from PIL import Image, ImageTk
+from concurrent.futures import Future
 
 import undis.util as util
 from undis.asset import Asset
 import color
+import image_loader
 
 
 class ResultFrame(tk.Canvas):
@@ -78,36 +80,19 @@ class InnerResultFrame(tk.Frame):
         self.workspace: str | None = None
         self.list_of_images = []
         self.image_buttons = []
-        # self.image_buttons = [
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        #     ImageButton(self, "/home/toroidalfox/test.png"),
-        # ]
-
-        # TODO test code
 
         # self.bind(sequence="<Configure>", func=self.handler_resize)
 
     def update_workspace(self, workspace: str | None):
         self.workspace = workspace
-        if self.workspace is None:
-            return
 
         self.list_of_images = []
         for button in self.image_buttons:
             button.destroy()
         self.image_buttons = []
+
+        if self.workspace is None:
+            return
 
         for directory, subdirectories, files in os.walk(self.workspace):
             for file in files:
@@ -219,6 +204,8 @@ class ImageButton(tk.Frame):
         self.grid_rowconfigure(1, weight=1)
         util.add_bindtag_to(bindtag_of=self, to=self.image_name_text)
 
+        self.image_loader_future = None
+
         # call unload function to start from unloaded state
         self.unload_image()
 
@@ -231,32 +218,28 @@ class ImageButton(tk.Frame):
         # hover
         self.bind(sequence="<Enter>", func=self.handler_hover_enter)
         self.bind(sequence="<Leave>", func=self.handler_hover_exit)
-        self.bind(sequence="<Visibility>", func=self.visibility_test)
 
         # call hover exit handler to set initial background color
         self.handler_hover_exit(None)
 
-    def visibility_test(self, event):
-        if util.Visibility.is_state_visible(event.state):
-            # print("visible")
-            pass
-        elif util.Visibility.is_state_obsucured(event.state):
-            print("obscured")
-
     def destroy(self):
+        if self.image_loader_future is not None:
+            self.image_loader_future.cancel()
         super().destroy()
 
     def load_image(self):
+        self.image_loader_future = image_loader.image_loader.submit(load_image_future, self, self.image_path)
+        self.image_loader_future.add_done_callback(self.__load_image_callback)
+
+    def __load_image_callback(self, image_future: Future[Image.Image]):
         try:
-            image = Image.open(self.image_path)
-            image.thumbnail(
-                size=(self.IMAGE_MAX_DIMENSION, self.IMAGE_MAX_DIMENSION),
-                resample=Image.BILINEAR,
-            )
+            image = image_future.result(timeout=0)
         except Exception as _:
-            image = Asset.MISSING_IMAGE
+            self.image_loader_future = None
+            return
         self._image = ImageTk.PhotoImage(image=image, size=strecth_image_size(image.size))
         self.image_preview.configure(image=self._image)
+        self.image_loader_future = None
         self.image_loaded = True
 
     def unload_image(self):
@@ -282,10 +265,8 @@ class ImageButton(tk.Frame):
 
     def handler_visibility(self, event):
         if self.image_loaded is False and util.Visibility.is_state_visible(event.state):
-            print("uploaded")
             self.load_image()
         elif self.image_loaded is True and util.Visibility.is_state_obsucured(event.state):
-            print("unuploaded")
             self.unload_image()
 
     def handler_double_click(self, _):
@@ -310,3 +291,15 @@ def strecth_image_size(size: tuple[int, int]) -> tuple[int, int]:
         return (int(max_dim * aspect_ratio), max_dim)
     else:
         return (max_dim, int(max_dim / aspect_ratio))
+
+
+def load_image_future(image_button: ImageButton, image_path: str) -> Image.Image:
+    try:
+        image = Image.open(image_path)
+        image.thumbnail(
+            size=(ImageButton.IMAGE_MAX_DIMENSION, ImageButton.IMAGE_MAX_DIMENSION),
+            resample=Image.BILINEAR,
+        )
+    except Exception as _:
+        image = Asset.MISSING_IMAGE
+    return image

@@ -37,7 +37,10 @@ class App(tk.Tk):
         self.save_button()
 
     def open_workspace(self):
-        self.workspace = filedialog.askdirectory()
+        retrieved_workspace = filedialog.askdirectory()
+        if retrieved_workspace == ():
+            return
+        self.workspace = retrieved_workspace
         self.panel.get__panel().update_workspace(self.workspace)
 
     def menu_construct(self):
