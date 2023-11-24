@@ -26,7 +26,9 @@ class DrawCanvas(tkinter.Canvas):
 
     def draw_some(self, event):
         global lasx, lasy
-        self.create_line((lasx, lasy, event.x, event.y), fill="black", width=self.brush_width)
+        self.create_line(
+            (lasx, lasy, event.x, event.y), fill="black", width=self.brush_width, joinstyle="round", capstyle="round"
+        )
         self.create_oval(
             event.x - self.brush_tip_radius,
             event.y - self.brush_tip_radius,
