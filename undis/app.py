@@ -41,15 +41,13 @@ class App(tk.Tk):
 
         self.model_option = None
         self.load_model = None
-        self.image_load = None
-        self.sketch_load = None
         self.executer = ThreadPoolExecutor(max_workers=2)
 
         # Thread pool
         self.thread_pool_executor([lambda: self.load_module()])
 
         self.clear_button()
-        self.save_button()
+        self.retrieve_image_button()
 
     def open_workspace(self):
         retrieved_workspace = filedialog.askdirectory()
@@ -57,8 +55,6 @@ class App(tk.Tk):
             return
         self.workspace = retrieved_workspace
         self.panel.get__panel().update_workspace(self.workspace, self.load_model)
-        if self.image_load is not None :
-            self.image_load.LoadImage(image=self.panel.get__panel().valid_image)
 
     def menu_construct(self):
         if getattr(self, "_menu_constructed", False) is True:
@@ -84,8 +80,8 @@ class App(tk.Tk):
         self.playbutton.place(x=50)
         self.playbutton.pack(side="left", anchor="nw")
 
-    def save_button(self):
-        self.playbutton = ctk.CTkButton(self, text="save", command=self.Canvas_layer.save)
+    def retrieve_image_button(self):
+        self.playbutton = ctk.CTkButton(self, text="retrieve", command=lambda: self.Canvas_layer.retrieve_image(model=self.load_model))
         self.playbutton.place(x=80)
         self.playbutton.pack(side="left", anchor="nw")
         self.debugbutton = ctk.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
@@ -96,14 +92,8 @@ class App(tk.Tk):
         for task in tasks :
             future = self.executer.submit(task)
 
-    # model, image, sketch 로딩
+    # Load Model
     def load_module(self) :
         self.model_option = Option().parse()
         self.load_model = ModelLoader(self.model_option)
-
-        im_path = '.'
-        self.image_load = ImageLoader(self.load_model, im_path, self.model_option)
-        self.image_load.LoadImageToken()
-
-        self.sketch_load = SketchLoader(self.load_model, self.model_option)
 

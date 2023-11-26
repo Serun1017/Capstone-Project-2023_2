@@ -9,7 +9,6 @@ from . import util
 from .asset import Asset
 from . import color
 from . import image_loader
-from module.data_utils.dataset import ValidSet
 from torchvision.transforms import transforms
 
 import torch
@@ -194,6 +193,7 @@ class ImageButton(tk.Frame):
 
         self.tokenized_image = transforms.Tensor
         self.model = model
+        self.is_image_tokenized = False
 
     def destroy(self):
         if self.image_loader_future is not None:
@@ -221,11 +221,11 @@ class ImageButton(tk.Frame):
     def __image_tokenize_callback(self, tokenized_image: Future[Image.Image]) :
         try :
             self.tokenized_image = tokenized_image.result()
-            print(self.tokenized_image)
+            self.is_image_tokenized = True
         except Exception as _ :
             self.tokenized_image = None
+            self.is_image_tokenized = False
             return
-        self.image_tokenized = True
 
     def unload_image(self):
         self._image = ImageTk.PhotoImage(image=Asset.EMPTY_IMAGE)

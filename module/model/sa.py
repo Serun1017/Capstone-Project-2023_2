@@ -171,7 +171,6 @@ class ViTPatch(nn.Module):
         x1 = self.embedding(img)
         x2 = self.scale(img)
         x = (x1 + x2) / 2
-        print(0)
 
         x = rearrange(x, "b c h w  -> b (h w) c")
         b, n, _ = x.shape

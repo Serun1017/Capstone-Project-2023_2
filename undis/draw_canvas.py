@@ -1,7 +1,14 @@
 import tkinter
 from PIL import Image
 import numpy as np
+import cv2
+import torch
+import io
 
+from module.data_utils.utils import remove_white_space_image, resize_image_by_ratio, make_img_square
+from torchvision.transforms import transforms
+from . import image_loader
+from concurrent.futures import Future
 
 class DrawCanvas(tkinter.Canvas):
     def __init__(self, master, w, h):
@@ -47,15 +54,52 @@ class DrawCanvas(tkinter.Canvas):
     # 실행취소는 find_all()에서 delete(id:int)를 이용해서 구현할 수 있을 것 같음.
     # 지우개는 하얀색 칠하기 보다 find_overlapping() 혹은 find_closest()를 이용하면 될 것 같음.
 
-    def save(self):
-        self.postscript(file="image")
-        img = Image.open("image")
-        img2 = np.array(img)
-        print(img2)
+    def retrieve_image(self, model):
+        ps = self.postscript(colormode='color')
+        image = Image.open(io.BytesIO(ps.encode('utf-8')))
 
+        self.sk_data = np.array(image)
+        self.sk_tokenized = False
+        self.sk_future = image_loader.image_loader.submit(tokenize_sketch_data, model, self.sk_data)
+        self.sk_future.add_done_callback(self.__tokenize_sketch_callback)
+
+    
+    def __tokenize_sketch_callback(self, sk_future: Future[Image.Image]) :
+        try :
+            self.sk_data = sk_future.result(timeout=0)
+            self.sk_tokenized = True
+            print(self.sk_data)
+        except Exception as _ :
+            self.sk_data = None
+            self.sk_tokenized = False
+        
     def debug(self):
         print("canvas debug dump")
         for child in self.find_all():
             print(child)
         print(self.type(1))
         print(self.coords(1))
+
+# Load sk_data (numpy array) and preprocecss the sketch.
+def tokenize_sketch_data(model, sketch) :
+    sk_data = cv2.cvtColor(sketch, cv2.COLOR_BGR2RGB)
+
+    immean = [0.5, 0.5, 0.5]  # RGB channel mean for imagenet
+    imstd = [0.5, 0.5, 0.5]
+
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(immean, imstd)
+    ])
+
+    sk_data = remove_white_space_image(sk_data, 10)
+    sk_data = resize_image_by_ratio(sk_data, 224)
+    sk_data = make_img_square(sk_data)
+
+    sk_data = transform(sk_data).half()
+    sk_data = torch.unsqueeze(sk_data, 0)
+    sk_data = sk_data.cuda()
+
+    sk_data, _ = model(sk_data, None, 'test', only_sa=True) 
+
+    return sk_data
