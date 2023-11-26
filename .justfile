@@ -12,3 +12,9 @@ run:
 # start documentation server
 doc:
 	poetry run pdoc undis
+
+package:
+	poetry run pyinstaller -y undis.spec
+
+packaged-run:
+	./dist/undis/undis

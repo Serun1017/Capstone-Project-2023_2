@@ -10,7 +10,9 @@ a = Analysis(
         ("assets/Empty-Image.png", "assets"),
         ("assets/Missing-Image.png", "assets"),
     ],
-    hiddenimports=[],
+    hiddenimports=[
+        "PIL._tkinter_finder",
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
