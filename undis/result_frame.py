@@ -207,8 +207,8 @@ class ImageButton(tk.Frame):
     def __load_image_callback(self, image_future: Future[Image.Image]):
         try:
             image  = image_future.result(timeout=0)
-            self.tokenized_image = image_loader.image_loader.submit(SelfAttention, image, self.model)
-            self.tokenized_image.add_done_callback(self.__image_tokenize_callback)
+            self.tokenized_image_future = image_loader.image_loader.submit(SelfAttention, image, self.model)
+            self.tokenized_image_future.add_done_callback(self.__image_tokenize_callback)
 
         except Exception as _:
             self.image_loader_future = None

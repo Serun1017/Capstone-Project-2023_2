@@ -9,6 +9,8 @@ from module.data_utils.utils import remove_white_space_image, resize_image_by_ra
 from torchvision.transforms import transforms
 from . import image_loader
 from concurrent.futures import Future
+from .result_frame import ImageButton
+from typing import List
 
 class DrawCanvas(tkinter.Canvas):
     def __init__(self, master, w, h):
@@ -54,24 +56,37 @@ class DrawCanvas(tkinter.Canvas):
     # 실행취소는 find_all()에서 delete(id:int)를 이용해서 구현할 수 있을 것 같음.
     # 지우개는 하얀색 칠하기 보다 find_overlapping() 혹은 find_closest()를 이용하면 될 것 같음.
 
-    def retrieve_image(self, model):
+    def retrieve_image(self, model, image_data_list: List[ImageButton]):
         ps = self.postscript(colormode='color')
         image = Image.open(io.BytesIO(ps.encode('utf-8')))
 
+
+        self.model = model
+        self.image_data_list = image_data_list
+
         self.sk_data = np.array(image)
-        self.sk_tokenized = False
-        self.sk_future = image_loader.image_loader.submit(tokenize_sketch_data, model, self.sk_data)
+        self.is_sk_tokenized = False
+        self.sk_tokenized_data = transforms.Tensor
+
+        self.sk_future = image_loader.image_loader.submit(tokenize_sketch_data, self.model, self.sk_data)
         self.sk_future.add_done_callback(self.__tokenize_sketch_callback)
 
-    
     def __tokenize_sketch_callback(self, sk_future: Future[Image.Image]) :
         try :
-            self.sk_data = sk_future.result(timeout=0)
-            self.sk_tokenized = True
-            print(self.sk_data)
+            self.sk_tokenized_data = sk_future.result(timeout=0)
+            self.is_sk_tokenized = True
+
+            self.rn = image_loader.image_loader.submit(cross_attention, self.model, self.sk_tokenized_data, self.image_data_list)
+            self.rn.add_done_callback(self.__cross_attention)
         except Exception as _ :
-            self.sk_data = None
-            self.sk_tokenized = False
+            self.sk_tokenized_data = None
+            self.is_sk_tokenized = False
+
+    def __cross_attention(self, rn: Future[Image.Image]) :
+        try :
+            self.result = rn.result(timeout=0)
+        except Exception as _ :
+            self.result = None
         
     def debug(self):
         print("canvas debug dump")
@@ -103,3 +118,35 @@ def tokenize_sketch_data(model, sketch) :
     sk_data, _ = model(sk_data, None, 'test', only_sa=True) 
 
     return sk_data
+
+def cross_attention(model, sketch_data, image_data_list: List[ImageButton]) :
+    labels = np.array([])
+    dist_im = []
+    
+    for i, image_data in enumerate(image_data_list) :
+        if image_data.is_image_tokenized == True :
+            labels = np.append(labels, image_data.image_path)
+
+            sk_temp = sketch_data.unsqueeze(1).repeat(1, 1, 1, 1).flatten(0, 1).cuda()
+            im_temp = image_data.tokenized_image.unsqueeze(0).repeat(1, 1, 1, 1).flatten(0, 1).cuda()
+            feature_1, feature_2 = model(sk_temp, im_temp, 'test')
+
+            if i == 0 :
+                dist_im = feature_2.view(1, 1).cpu().data.numpy()  # 1*args.batch
+            else :
+                dist_im = np.concatenate((dist_im, feature_2.view(1, 1).cpu().data.numpy()), axis=1) # type:ignore
+
+        else :
+           image_data_list.append(image_data)
+    dist_im = np.squeeze(dist_im)
+
+    sorted_indices = np.argsort(dist_im)
+    sorted_indices = sorted_indices[::-1]
+
+    dist_im = dist_im[sorted_indices]
+    labels = labels[sorted_indices]
+
+    result = np.stack([dist_im, labels])
+    
+    print(result)
+    return result

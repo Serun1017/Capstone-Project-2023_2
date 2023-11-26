@@ -6,8 +6,6 @@ import os
 import threading
 from module.ModelLoad import ModelLoader
 from module.options import Option
-from module.ImagePreload import ImageLoader
-from module.SketchPreload import SketchLoader
 from concurrent.futures import ThreadPoolExecutor, Future
 from typing import Any
 
@@ -81,7 +79,7 @@ class App(tk.Tk):
         self.playbutton.pack(side="left", anchor="nw")
 
     def retrieve_image_button(self):
-        self.playbutton = ctk.CTkButton(self, text="retrieve", command=lambda: self.Canvas_layer.retrieve_image(model=self.load_model))
+        self.playbutton = ctk.CTkButton(self, text="retrieve", command=lambda: self.Canvas_layer.retrieve_image(model=self.load_model, image_data_list=self.panel.get__panel().image_buttons))
         self.playbutton.place(x=80)
         self.playbutton.pack(side="left", anchor="nw")
         self.debugbutton = ctk.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
