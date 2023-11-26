@@ -15,20 +15,23 @@ class ImageLoader() :
         self.im_dictionary = dict() # im_labels: Tensors, im_labels are set of im_label sized by args.test_im. {('case1', 'case2') : Tensor([case1Tensor], [case2Tensor])}
         self.im_tokenized_label = set() # set of image labels that tokenized.
     
+
+    ### LoadImage 수정할 것.
     # Load Image data and Call DataLoader to put in Model
-    def LoadImage(self) :
-        image = ValidSet(self.im_path, type_skim='im', half=True)
+    def LoadImage(self, image: ValidSet) :
+        if image.file_names.__len__() == 0 :
+            return
+        
         # If image was already Tokenized, exclude the image
-        if self.im_tokenized_label.intersection(image.cls) :
-            intersect_image = self.im_tokenized_label.intersection(image.cls)
+        if self.im_tokenized_label.intersection(image.file_names) :
+            intersect_image = self.im_tokenized_label.intersection(image.file_names)
             for im in intersect_image :
-                index = np.where(image.cls == im)
-                image.cls = np.delete(image.cls, index)
+                index = np.where(image.file_names == im)
                 image.file_names = np.delete(image.file_names, index)
         
         # Image has been Loaded to im_dictionary
         self.im_dataload = DataLoader(image, batch_size=self.args.test_im, num_workers=self.args.num_workers, drop_last=False)
-        # Return Loaded Image Number
+        
         return image.__len__()
 
     # Call this Method if the image has already tokenized and if you want to tokenize the image
@@ -70,12 +73,13 @@ class ImageLoader() :
             return None
         # Tokenize the Image Data
         new_im_dictionary = dict()
-        for i, (im, im_label) in enumerate(self.im_dataload) :
-            im = im.cuda()
-            im, im_idxs = self.model(im, None, 'test', only_sa=True)
+        # for im, im_label in self.im_dataload :
+            # im = im.cuda()
+            # im, im_idxs = self.model(im, None, 'test', only_sa=True)
 
-            new_im_dictionary[im_label] = im
-        self.__UpdateImageDictionary__(new_im_dictionary)
+            # new_im_dictionary[im_label] = im
+        # self.__UpdateImageDictionary__(new_im_dictionary)
+        print("Image has been tokenized")
 
     # Save Image Self Attention Data
     def SaveImageToken(self, filename='im_dictionary.pt') :
@@ -88,6 +92,7 @@ class ImageLoader() :
             return False
         new_im_dictionary = torch.load(filename)
         self.__UpdateImageDictionary__(new_im_dictionary)
+        print('ImageToken loaded')
         return True
 
     # Update Image Dictionary. It exclude exists new images when the images are already tokenized and saved in im_dictionary

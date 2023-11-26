@@ -1,6 +1,5 @@
 import argparse
 
-
 class Option:
     def __init__(self):
         parser = argparse.ArgumentParser(description="args for model")

@@ -125,7 +125,6 @@ class Encoder(nn.Module):
         x = img
         left_tokens = []
         idxs = []
-
         for i, layer in enumerate(self.layers):
             x, left_token, idx = layer[0](x, self.keep_rate[i])
             left_tokens.append(left_token)
@@ -172,6 +171,7 @@ class ViTPatch(nn.Module):
         x1 = self.embedding(img)
         x2 = self.scale(img)
         x = (x1 + x2) / 2
+        print(0)
 
         x = rearrange(x, "b c h w  -> b (h w) c")
         b, n, _ = x.shape
@@ -184,7 +184,6 @@ class ViTPatch(nn.Module):
 
         # x1 = self.to_cls_token(x[:, 0])
         # return x1, x[:, 1:]
-
         return x, left_tokens, idxs
 
 

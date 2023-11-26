@@ -9,6 +9,10 @@ from . import util
 from .asset import Asset
 from . import color
 from . import image_loader
+from module.data_utils.dataset import ValidSet
+from torchvision.transforms import transforms
+
+import torch
 
 
 class ResultFrame(tk.Canvas):
@@ -78,8 +82,8 @@ class InnerResultFrame(tk.Frame):
         self.workspace: str | None = None
         self.list_of_images = []
         self.image_buttons = []
-
-    def update_workspace(self, workspace: str | None):
+        
+    def update_workspace(self, workspace: str | None, model):
         self.workspace = workspace
 
         self.list_of_images = []
@@ -95,7 +99,7 @@ class InnerResultFrame(tk.Frame):
                 if os.path.splitext(file)[1] in Asset.SUPPORTED_IMAGE_EXTENSIONS:
                     full_file_path = os.path.join(directory, file)
                     self.list_of_images.append(full_file_path)
-                    self.image_buttons.append(ImageButton(self, full_file_path))
+                    self.image_buttons.append(ImageButton(self, full_file_path, model))
 
     def destroy(self):
         super().destroy()
@@ -142,7 +146,7 @@ class ImageButton(tk.Frame):
     def actual_width() -> int:
         return ImageButton.IMAGE_MAX_DIMENSION + ImageButton.std_pad * 2
 
-    def __init__(self, master, image_path: str, **kwargs):
+    def __init__(self, master, image_path: str, model, **kwargs):
         super().__init__(
             master=master,
             borderwidth=0,
@@ -188,6 +192,9 @@ class ImageButton(tk.Frame):
         # call hover exit handler to set initial background color
         self.handler_hover_exit(None)
 
+        self.tokenized_image = transforms.Tensor
+        self.model = model
+
     def destroy(self):
         if self.image_loader_future is not None:
             self.image_loader_future.cancel()
@@ -199,7 +206,10 @@ class ImageButton(tk.Frame):
 
     def __load_image_callback(self, image_future: Future[Image.Image]):
         try:
-            image = image_future.result(timeout=0)
+            image  = image_future.result(timeout=0)
+            self.tokenized_image = image_loader.image_loader.submit(SelfAttention, image, self.model)
+            self.tokenized_image.add_done_callback(self.__image_tokenize_callback)
+
         except Exception as _:
             self.image_loader_future = None
             return
@@ -207,6 +217,15 @@ class ImageButton(tk.Frame):
         self.image_preview.configure(image=self._image)
         self.image_loader_future = None
         self.image_loaded = True
+
+    def __image_tokenize_callback(self, tokenized_image: Future[Image.Image]) :
+        try :
+            self.tokenized_image = tokenized_image.result()
+            print(self.tokenized_image)
+        except Exception as _ :
+            self.tokenized_image = None
+            return
+        self.image_tokenized = True
 
     def unload_image(self):
         self._image = ImageTk.PhotoImage(image=Asset.EMPTY_IMAGE)
@@ -262,10 +281,29 @@ def strecth_image_size(size: tuple[int, int]) -> tuple[int, int]:
 def load_image_future(image_button: ImageButton, image_path: str) -> Image.Image:
     try:
         image = Image.open(image_path)
+
         image.thumbnail(
             size=(ImageButton.IMAGE_MAX_DIMENSION, ImageButton.IMAGE_MAX_DIMENSION),
             resample=Image.BILINEAR,
         )
+        
     except Exception as _:
         image = Asset.MISSING_IMAGE
+
     return image
+
+def SelfAttention(image, model) :
+    immean = [0.5, 0.5, 0.5]  # RGB channel mean for imagenet
+    imstd = [0.5, 0.5, 0.5]
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(immean, imstd)
+    ])
+    tokenized_image = transform(image.resize((224, 224)).convert('RGB'))
+    tokenized_image = tokenized_image.half()
+    tokenized_image= torch.unsqueeze(tokenized_image, 0)
+
+    tokenized_image = tokenized_image.cuda()
+    tokenized_image, _ = model(tokenized_image, None, 'test', only_sa=True)
+
+    return tokenized_image

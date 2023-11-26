@@ -1,18 +1,15 @@
 import tkinter as tk
 from tkinter import filedialog
 import customtkinter
-
-from asset import Asset
-import color
-import result_frame
-
 import os
-
-import draw_canvas
 
 import threading
 from module.ModelLoad import ModelLoader
 from module.options import Option
+from module.ImagePreload import ImageLoader
+from module.SketchPreload import SketchLoader
+from concurrent.futures import ThreadPoolExecutor, Future
+from typing import Any
 
 Width = 600
 Height = 600
@@ -42,14 +39,15 @@ class App(tk.Tk):
         self.Canvas_layer = draw_canvas.DrawCanvas(self, 512, 512)
         self.Canvas_layer.pack(fill="both")
 
-        # 모델 로드 스레드 추가 및 실행
-        '''
-        self.thread = threading.Thread(target=self.load_module, args=())
-        self.thread.daemon = True
-        self.thread.start()
-        '''
-        self.load_module()
-        
+        self.model_option = None
+        self.load_model = None
+        self.image_load = None
+        self.sketch_load = None
+        self.executer = ThreadPoolExecutor(max_workers=2)
+
+        # Thread pool
+        self.thread_pool_executor([lambda: self.load_module()])
+
         self.clear_button()
         self.save_button()
 
@@ -58,7 +56,9 @@ class App(tk.Tk):
         if retrieved_workspace == ():
             return
         self.workspace = retrieved_workspace
-        self.panel.get__panel().update_workspace(self.workspace)
+        self.panel.get__panel().update_workspace(self.workspace, self.load_model)
+        if self.image_load is not None :
+            self.image_load.LoadImage(image=self.panel.get__panel().valid_image)
 
     def menu_construct(self):
         if getattr(self, "_menu_constructed", False) is True:
@@ -92,7 +92,18 @@ class App(tk.Tk):
         self.debugbutton.place(x=110)
         self.debugbutton.pack(side="left", anchor="nw")
 
+    def thread_pool_executor(self, tasks) :
+        for task in tasks :
+            future = self.executer.submit(task)
+
+    # model, image, sketch 로딩
     def load_module(self) :
         self.model_option = Option().parse()
         self.load_model = ModelLoader(self.model_option)
+
+        im_path = '.'
+        self.image_load = ImageLoader(self.load_model, im_path, self.model_option)
+        self.image_load.LoadImageToken()
+
+        self.sketch_load = SketchLoader(self.load_model, self.model_option)
 
