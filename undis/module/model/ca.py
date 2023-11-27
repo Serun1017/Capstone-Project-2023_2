@@ -24,7 +24,6 @@ class LayerNorm(nn.Module):
 
 
 class AddAndNorm(nn.Module):
-
     def __init__(self, size, dropout):
         super(AddAndNorm, self).__init__()
         self.norm = LayerNorm(size)
@@ -51,7 +50,6 @@ class EncoderLayer(nn.Module):
 
 
 class Encoder(nn.Module):
-
     def __init__(self, layer, N):
         super(Encoder, self).__init__()
         self.layers = clones(layer, N)
@@ -114,17 +112,16 @@ class MultiHeadedAttention(nn.Module):
         # 1) Do all the linear projections in batch from d_model => h x d_k
 
         # size(batch,h,seq,dk)
-        query, key, value = \
-            [lin(x).view(nbatches, -1, self.h, self.d_k).transpose(1, 2)
-             for lin, x in zip(self.linears, (query, key, value))]
+        query, key, value = [
+            lin(x).view(nbatches, -1, self.h, self.d_k).transpose(1, 2)
+            for lin, x in zip(self.linears, (query, key, value))
+        ]
 
         # 2) Apply attention on all the projected vectors in batch.
-        x, self.attn = attention(query, key, value, mask=mask,
-                                 dropout=self.dropout)
+        x, self.attn = attention(query, key, value, mask=mask, dropout=self.dropout)
 
         # 3) "Concat" using a view and apply a final linear.
-        x = x.transpose(1, 2).contiguous() \
-            .view(nbatches, -1, self.h * self.d_k)
+        x = x.transpose(1, 2).contiguous().view(nbatches, -1, self.h * self.d_k)
 
         return self.linears[-1](x)
 
@@ -157,7 +154,7 @@ class Cross_Attention(nn.Module):
 
     def forward(self, x):
         length = x.size(0)
-        x_sk = x[:length // 2]
-        x_im = x[length // 2:]
+        x_sk = x[: length // 2]
+        x_im = x[length // 2 :]
         x_im, x_sk = self.encoder(x_im, x_sk, None)  # 不要mask
         return torch.cat((x_sk, x_im), dim=0)

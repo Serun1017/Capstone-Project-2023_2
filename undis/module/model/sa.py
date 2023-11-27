@@ -4,6 +4,8 @@ from einops import rearrange, repeat
 from .rn import Scale_Embedding
 import math
 
+from ...util import path_from_root
+
 MIN_NUM_PATCHES = 16
 
 
@@ -126,7 +128,7 @@ class Encoder(nn.Module):
         left_tokens = []
         idxs = []
         for i, layer in enumerate(self.layers):
-            x, left_token, idx = layer[0](x, self.keep_rate[i])
+            x, left_token, idx = layer[0](x, self.keep_rate[i])  # type: ignore
             left_tokens.append(left_token)
             idxs.append(idx)
 
@@ -201,7 +203,7 @@ class Self_Attention(nn.Module):
             emb_dropout=0.1,
         )
         if pretrained:
-            checkpoint = torch.load("./module/model/sam_ViT-B_16.pth")
+            checkpoint = torch.load(path_from_root("assets", "sam-ViT-B_16.pth"))
             cur = self.model.state_dict()
             new = {k: v for k, v in checkpoint.items() if k in cur.keys() and "mlp_head" not in k}
             cur.update(new)

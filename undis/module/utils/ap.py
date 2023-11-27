@@ -5,37 +5,34 @@ from joblib import delayed, Parallel
 
 
 def calculate(distance, class_same, test=None):
-    arg_sort_sim = distance.argsort()   # 得到从小到大索引值
+    arg_sort_sim = distance.argsort()
     sort_label = []
     for index in range(0, arg_sort_sim.shape[0]):
-        # 将label重新排序，根据距离的远近，距离越近的排在前面
         sort_label.append(class_same[index, arg_sort_sim[index, :]])
     sort_label = np.array(sort_label)
     # print(arg_sort_sim, sort_label)
 
-    # 多进程计算
     num_cores = min(multiprocessing.cpu_count(), 4)
 
     if test:
         start = time.time()
 
-        aps_all = Parallel(n_jobs=num_cores)(
-            delayed(voc_eval)(sort_label[iq]) for iq in range(distance.shape[0]))
-        aps_200 = Parallel(n_jobs=num_cores)(
-            delayed(voc_eval)(sort_label[iq], 200) for iq in range(distance.shape[0]))
-        map_all = np.nanmean(aps_all)
-        map_200 = np.nanmean(aps_200)
+        aps_all = Parallel(n_jobs=num_cores)(delayed(voc_eval)(sort_label[iq]) for iq in range(distance.shape[0]))
+        aps_200 = Parallel(n_jobs=num_cores)(delayed(voc_eval)(sort_label[iq], 200) for iq in range(distance.shape[0]))
+        map_all = np.nanmean(aps_all)  # type: ignore
+        map_200 = np.nanmean(aps_200)  # type: ignore
 
         precision_100 = Parallel(n_jobs=num_cores)(
-            delayed(precision_eval)(sort_label[iq], 100) for iq in range(sort_label.shape[0]))
-        precision_100 = np.nanmean(precision_100)
+            delayed(precision_eval)(sort_label[iq], 100) for iq in range(sort_label.shape[0])
+        )
+        precision_100 = np.nanmean(precision_100)  # type: ignore
         precision_200 = Parallel(n_jobs=num_cores)(
-            delayed(precision_eval)(sort_label[iq], 200) for iq in range(sort_label.shape[0]))
-        precision_200 = np.nanmean(precision_200)
+            delayed(precision_eval)(sort_label[iq], 200) for iq in range(sort_label.shape[0])
+        )
+        precision_200 = np.nanmean(precision_200)  # type: ignore
 
         print("eval time:", time.time() - start)
         return map_all, map_200, precision_100, precision_200
-
 
 
 def voc_eval(sort_class_same, top=None):

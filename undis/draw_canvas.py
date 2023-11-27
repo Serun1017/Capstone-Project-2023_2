@@ -7,10 +7,11 @@ import io
 
 from module.data_utils.utils import remove_white_space_image, resize_image_by_ratio, make_img_square
 from torchvision.transforms import transforms
-from . import image_loader
 from concurrent.futures import Future
-from .result_frame import ImageButton
 from typing import List
+
+from .asset import Asset, asset_loader
+from .component import ImageButton
 
 
 class DrawCanvas(tkinter.Canvas):
@@ -56,22 +57,17 @@ class DrawCanvas(tkinter.Canvas):
     def clear(self):
         self.delete(tkinter.ALL)
 
-    # 지금은 line과 oval을 이용해서 부드러운 선을 그리고 있음. create_line의 join style과 capstyle을 이용하면 된다는 것을 알아챔.
-    # 실행취소는 find_all()에서 delete(id:int)를 이용해서 구현할 수 있을 것 같음.
-    # 지우개는 하얀색 칠하기 보다 find_overlapping() 혹은 find_closest()를 이용하면 될 것 같음.
-
-    def retrieve_image(self, model, image_data_list: List[ImageButton]):
+    def retrieve_image(self, image_data_list: List[ImageButton]):
         ps = self.postscript(colormode="color")
         image = Image.open(io.BytesIO(ps.encode("utf-8")))
 
-        self.model = model
         self.image_data_list = image_data_list
 
         self.sk_data = np.array(image)
         self.is_sk_tokenized = False
         self.sk_tokenized_data = transforms.Tensor
 
-        self.sk_future = image_loader.image_loader.submit(tokenize_sketch_data, self.model, self.sk_data)
+        self.sk_future = asset_loader.submit(tokenize_sketch_data, Asset.MODEL.result(), self.sk_data)
         self.sk_future.add_done_callback(self.__tokenize_sketch_callback)
 
     def __tokenize_sketch_callback(self, sk_future: Future[Image.Image]):
@@ -79,10 +75,10 @@ class DrawCanvas(tkinter.Canvas):
             self.sk_tokenized_data = sk_future.result(timeout=0)
             self.is_sk_tokenized = True
 
-            self.rn = image_loader.image_loader.submit(
-                cross_attention, self.model, self.sk_tokenized_data, self.image_data_list
+            self.rn = asset_loader.submit(
+                cross_attention, Asset.MODEL.result(), self.sk_tokenized_data, self.image_data_list
             )
-            self.rn.add_done_callback(self.__cross_attention)
+            self.rn.add_done_callback(self.__cross_attention)  # type: ignore
         except Exception as _:
             self.sk_tokenized_data = None
             self.is_sk_tokenized = False
@@ -119,7 +115,7 @@ def tokenize_sketch_data(model, sketch):
     sk_data = resize_image_by_ratio(sk_data, 224)
     sk_data = make_img_square(sk_data)
 
-    sk_data = transform(sk_data).half()
+    sk_data = transform(sk_data).half()  # type: ignore
     sk_data = torch.unsqueeze(sk_data, 0)
     sk_data = sk_data.cuda()
 

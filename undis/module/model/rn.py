@@ -16,7 +16,7 @@ class Relation_Network(nn.Module):
                 nn.Linear(343, 49, bias=True),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dropout),
-                nn.Linear(49, 1, bias=True)
+                nn.Linear(49, 1, bias=True),
             )
 
         # 1.0
@@ -28,7 +28,7 @@ class Relation_Network(nn.Module):
                 nn.Linear(2744, 196, bias=True),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dropout),
-                nn.Linear(196, 1, bias=True)
+                nn.Linear(196, 1, bias=True),
             )
 
         # 0.9
@@ -40,7 +40,7 @@ class Relation_Network(nn.Module):
                 nn.Linear(1728, 144, bias=True),
                 nn.ReLU(inplace=True),
                 nn.Dropout(dropout),
-                nn.Linear(144, 1, bias=True)
+                nn.Linear(144, 1, bias=True),
             )
 
         else:

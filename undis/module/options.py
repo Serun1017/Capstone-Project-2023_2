@@ -1,5 +1,8 @@
 import argparse
 
+from ..util import path_from_root
+
+
 class Option:
     def __init__(self):
         parser = argparse.ArgumentParser(description="args for model")
@@ -14,7 +17,7 @@ class Option:
         parser.add_argument("--anchor_number", "-a", type=int, default=49)
 
         # test
-        parser.add_argument("--load", "-l", type=str, default="./module/checkpoints/sketchy_ext/best_checkpoint.pth")
+        parser.add_argument("--load", "-l", type=str, default=path_from_root("assets", "best_checkpoint.pth"))
         parser.add_argument("--retrieval", "-r", type=str, default="rn", choices=["rn", "sa"])
         parser.add_argument("--testall", default=False, action="store_true", help="train/test scale")
         parser.add_argument("--test_sk", type=int, default=20)

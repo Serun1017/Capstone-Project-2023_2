@@ -6,12 +6,10 @@
 config.toml
 
 image
-<<<<<<< HEAD
-*.pth
-*.pt
-=======
 
 # pyinstaller
 build
 dist
->>>>>>> master
+
+# symlink
+test_images

@@ -2,13 +2,15 @@
 
 
 a = Analysis(
-    ['undis.py'],
+    ['undis/__main__.py'],
     pathex=["undis"],
     binaries=[],
     datas=[
         ("assets/theme.json", "assets"),
         ("assets/Empty-Image.png", "assets"),
         ("assets/Missing-Image.png", "assets"),
+        ("assets/sam_ViT-B_16.pth", "assets"),
+        ("assets/best_checkpoint.pth", "assets"),
     ],
     hiddenimports=[
         "PIL._tkinter_finder",

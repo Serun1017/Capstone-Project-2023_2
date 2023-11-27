@@ -94,4 +94,5 @@ _PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 
 
 def path_from_root(*paths: str | os.PathLike) -> str:
+    """Use this to flawlessly get a path of file that works in both development and production."""
     return os.path.join(_PROJECT_ROOT, "..", *paths)

@@ -1,20 +1,13 @@
 import tkinter as tk
 from tkinter import filedialog
-import customtkinter
-import os
-
-import threading
-from module.ModelLoad import ModelLoader
-from module.options import Option
-from concurrent.futures import ThreadPoolExecutor, Future
-from typing import Any
-
-Width = 600
-Height = 600
 import customtkinter as ctk
 
+from concurrent.futures import ThreadPoolExecutor
+
+
 from . import color
-from . import result_frame
+from . import component
+from .components import result_frame
 from . import draw_canvas
 
 
@@ -39,13 +32,9 @@ class App(tk.Tk):
 
         self.model_option = None
         self.load_model = None
-        self.executer = ThreadPoolExecutor(max_workers=2)
-
-        # Thread pool
-        self.thread_pool_executor([lambda: self.load_module()])
 
         self.clear_button()
-        self.retrieve_image_button()
+        # self.retrieve_image_button()
         self.erase_button()
         self.pen_button()
 
@@ -54,7 +43,7 @@ class App(tk.Tk):
         if retrieved_workspace == ():
             return
         self.workspace = retrieved_workspace
-        self.panel.get__panel().update_workspace(self.workspace, self.load_model)
+        self.panel.update_workspace(self.workspace, self.load_model)
 
     def menu_construct(self):
         if getattr(self, "_menu_constructed", False) is True:
@@ -80,35 +69,23 @@ class App(tk.Tk):
         self.playbutton.place(x=50)
         self.playbutton.pack(side="left", anchor="nw")
 
-    def retrieve_image_button(self):
-        self.playbutton = ctk.CTkButton(
-            self,
-            text="retrieve",
-            command=lambda: self.Canvas_layer.retrieve_image(
-                model=self.load_model, image_data_list=self.panel.get__panel().image_buttons
-            ),
-        )
-        self.playbutton.place(x=80)
-        self.playbutton.pack(side="left", anchor="nw")
-        self.debugbutton = ctk.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
-        self.debugbutton.place(x=110)
-        self.debugbutton.pack(side="left", anchor="nw")
-
-    def thread_pool_executor(self, tasks):
-        for task in tasks:
-            future = self.executer.submit(task)
-
-    # Load Model
-    def load_module(self):
-        self.model_option = Option().parse()
-        self.load_model = ModelLoader(self.model_option)
+    # def retrieve_image_button(self):
+    #     self.playbutton = ctk.CTkButton(
+    #         self,
+    #         text="retrieve",
+    #         command=lambda: self.Canvas_layer.retrieve_image(
+    #             model=self.load_model, image_data_list=self.panel.get__panel().image_buttons
+    #         ),
+    #     )
+    #     self.playbutton.place(x=80)
+    #     self.playbutton.pack(side="left", anchor="nw")
 
     def erase_button(self):
-        self.playbutton = customtkinter.CTkButton(self, text="erase", command=self.Canvas_layer.bind_eraser)
+        self.playbutton = ctk.CTkButton(self, text="erase", command=self.Canvas_layer.bind_eraser)
         self.playbutton.place(x=110)
         self.playbutton.pack(side="left", anchor="nw")
 
     def pen_button(self):
-        self.playbutton = customtkinter.CTkButton(self, text="pen", command=self.Canvas_layer.bind_pen)
+        self.playbutton = ctk.CTkButton(self, text="pen", command=self.Canvas_layer.bind_pen)
         self.playbutton.place(x=130)
         self.playbutton.pack(side="left", anchor="nw")

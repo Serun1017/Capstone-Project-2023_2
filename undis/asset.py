@@ -1,16 +1,23 @@
 import os
+from concurrent.futures import ThreadPoolExecutor, Future
 from PIL import Image
-from typing import final
+from typing import final, Any
 
+from module.ModelLoad import load_model
+from module.options import Option
 from . import util
+
+
+asset_loader = ThreadPoolExecutor(max_workers=4)
 
 
 @final
 class Asset:
-    __BLANK_IMAGE = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
+    __BLANK_IMAGE = Image.new("RGBA", (1, 1), (0, 0, 0, 0))
     EMPTY_IMAGE = __BLANK_IMAGE
     MISSING_IMAGE = __BLANK_IMAGE
     SUPPORTED_IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png"]
+    MODEL = asset_loader.submit(lambda: load_model(Option().parse()))
 
     @staticmethod
     def init():
