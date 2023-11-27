@@ -7,7 +7,7 @@ default:
 
 # run project
 run:
-	poetry run python undis
+	poetry run python undis_run.py
 
 # start documentation server
 doc:

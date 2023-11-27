@@ -2,10 +2,9 @@
 **/__pycache__
 .venv
 
-# config file
-config.toml
-
-image
+# large file
+assets/best_checkpoint.pth
+assets/sam_ViT-B_16.pth
 
 # pyinstaller
 build

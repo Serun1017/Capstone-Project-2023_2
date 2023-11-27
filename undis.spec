@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['undis/__main__.py'],
+    ['undis_run.py'],
     pathex=["undis"],
     binaries=[],
     datas=[

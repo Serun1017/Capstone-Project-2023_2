@@ -5,11 +5,11 @@ import cv2
 import torch
 import io
 
-from module.data_utils.utils import remove_white_space_image, resize_image_by_ratio, make_img_square
 from torchvision.transforms import transforms
 from concurrent.futures import Future
 from typing import List
 
+from .sbir_mod.data_utils.utils import remove_white_space_image, resize_image_by_ratio, make_img_square
 from .asset import Asset, asset_loader
 from .component import ImageButton
 
