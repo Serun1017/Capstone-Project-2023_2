@@ -7,11 +7,9 @@ import io
 
 from torchvision.transforms import transforms
 from concurrent.futures import Future
-from typing import List
 
 from .sbir_mod.data_utils.utils import remove_white_space_image, resize_image_by_ratio, make_img_square
 from .asset import Asset, asset_loader
-from .component import ImageButton
 
 
 class DrawCanvas(tkinter.Canvas):
@@ -57,7 +55,7 @@ class DrawCanvas(tkinter.Canvas):
     def clear(self):
         self.delete(tkinter.ALL)
 
-    def retrieve_image(self, image_data_list: List[ImageButton]):
+    def retrieve_image(self, image_data_list: list[tuple[str, transforms.Tensor]]):
         ps = self.postscript(colormode="color")
         image = Image.open(io.BytesIO(ps.encode("utf-8")))
 
@@ -86,6 +84,7 @@ class DrawCanvas(tkinter.Canvas):
     def __cross_attention(self, rn: Future[Image.Image]):
         try:
             self.result = rn.result(timeout=0)
+            print(self.result)
         except Exception as _:
             self.result = None
 
@@ -124,25 +123,24 @@ def tokenize_sketch_data(model, sketch):
     return sk_data
 
 
-def cross_attention(model, sketch_data, image_data_list: List[ImageButton]):
+def cross_attention(model, sketch_data, image_buttons: list[tuple[str, transforms.Tensor]]):
     labels = np.array([])
     dist_im = []
 
-    for i, image_data in enumerate(image_data_list):
-        if image_data.is_image_tokenized == True:
-            labels = np.append(labels, image_data.image_path)
+    initialized = False
+    for image_path, tokens in image_buttons:
+        labels = np.append(labels, image_path)
 
-            sk_temp = sketch_data.unsqueeze(1).repeat(1, 1, 1, 1).flatten(0, 1).cuda()
-            im_temp = image_data.tokenized_image.unsqueeze(0).repeat(1, 1, 1, 1).flatten(0, 1).cuda()  # type: ignore
-            feature_1, feature_2 = model(sk_temp, im_temp, "test")
+        sk_temp = sketch_data.unsqueeze(1).repeat(1, 1, 1, 1).flatten(0, 1).cuda()
+        im_temp = tokens.unsqueeze(0).repeat(1, 1, 1, 1).flatten(0, 1).cuda()  # type: ignore
+        feature_1, feature_2 = model(sk_temp, im_temp, "test")
 
-            if i == 0:
-                dist_im = feature_2.view(1, 1).cpu().data.numpy()  # 1*args.batch
-            else:
-                dist_im = np.concatenate((dist_im, feature_2.view(1, 1).cpu().data.numpy()), axis=1)  # type: ignore
-
+        if initialized is False:
+            dist_im = feature_2.view(1, 1).cpu().data.numpy()  # 1*args.batch
+            initialized = True
         else:
-            image_data_list.append(image_data)
+            dist_im = np.concatenate((dist_im, feature_2.view(1, 1).cpu().data.numpy()), axis=1)  # type: ignore
+
     dist_im = np.squeeze(dist_im)
 
     sorted_indices = np.argsort(dist_im)

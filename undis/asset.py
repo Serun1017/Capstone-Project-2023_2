@@ -28,6 +28,7 @@ class Asset:
         try:
             Asset.MISSING_IMAGE = Image.open(util.path_from_root("assets", "Missing-Image.png"))
         except Exception as _:
+            print("Placeholder image is missing.")
             pass
         supported_extensions = [
             extension

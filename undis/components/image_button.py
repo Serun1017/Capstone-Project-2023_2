@@ -41,11 +41,9 @@ class ImageButton(tk.Frame):
 
         self.tokenized_image = transforms.Tensor
 
-        self.__inner_frame = _InnerFrame(
-            master=self, text=self.image_name, padx=ImageButton.PADDING, pady=ImageButton.PADDING, borderwidth=0
-        )
+        self.__inner_frame = _InnerFrame(master=self, text=self.image_name, borderwidth=0)
+        self.__inner_frame.pack()
         self.load_image(self.image_path)
-        self.__inner_frame.pack(padx=ImageButton.PADDING, pady=ImageButton.PADDING)
 
         self.__inner_frame.bind(sequence="<Button-3>", func=self.handler_right_click)
         self.__inner_frame.bind(sequence="<Double-Button-1>", func=self.handler_double_left_click)
@@ -71,6 +69,7 @@ class ImageButton(tk.Frame):
 
     def __load_image_callback(self, image_future: Future[Image.Image]):
         try:
+            print("image loaded")
             image = image_future.result(timeout=0)
             self.__inner_frame.set_image(image=ImageTk.PhotoImage(image=image, size=stretch_image_size(image.size)))
             self.image_loader_future = None
@@ -88,6 +87,7 @@ class ImageButton(tk.Frame):
             self.is_image_tokenized = True
             self.tokenize_image_future = None
         except Exception as _:
+            self.tokenize_image_future = None
             self.tokenized_image = None
             self.is_image_tokenized = False
             return
@@ -126,7 +126,8 @@ class _InnerFrame(tk.Frame):
             master=master,
             **kwargs,
         )
-        self.image_frame = tk.Frame(master=self, padx=0, pady=0, borderwidth=0)
+        self.image_frame = tk.Frame(master=self, padx=ImageButton.PADDING, pady=ImageButton.PADDING, borderwidth=0)
+        self.image_frame.grid(column=0, row=0)
         util.add_bindtag_to(bindtag_of=self, to=self.image_frame)
         self.image_label = tk.Label(master=self.image_frame, padx=0, pady=0, borderwidth=0)
         self.image_label.pack(fill=tk.BOTH, expand=True)

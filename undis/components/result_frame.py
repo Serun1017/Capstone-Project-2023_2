@@ -1,6 +1,7 @@
 import os
 from itertools import cycle
 import tkinter as tk
+from torchvision.transforms import transforms
 
 from .. import color
 from ..asset import Asset
@@ -26,7 +27,7 @@ class ResultFrame(tk.Canvas):
         self.bind(sequence="<Enter>", func=self.handler_hover_enter)
         self.bind(sequence="<Leave>", func=self.handler_hover_exit)
 
-    def update_workspace(self, workspace: str | None, model):
+    def update_workspace(self, workspace: str | None):
         self.workspace = workspace
 
         self.list_of_images = []
@@ -41,8 +42,14 @@ class ResultFrame(tk.Canvas):
                     self.list_of_images.append(full_file_path)
 
         self.__inner_frame.create_buttons_from_list_of_images(self.list_of_images)
-        self.__inner_frame.explicit_resize(width=self.__inner_frame.winfo_width())
+        self.__inner_frame.explicit_resize(width=self.__inner_frame.winfo_width(), override=True, master=self)
         self.configure(scrollregion=self.bbox(tk.ALL))
+
+    def get_list_of_images(self) -> list[tuple[str, transforms.Tensor]]:
+        list_of_images = []
+        for image_button in self.__inner_frame.get_image_buttons():
+            list_of_images.append((image_button.image_path, image_button.tokenized_image))
+        return list_of_images
 
     def handler_resize(self, event):
         self.__inner_frame.configure(width=event.width - self.__scroll_bar.winfo_width())
@@ -102,8 +109,11 @@ class InnerResultFrame(tk.Frame):
     def destroy(self):
         super().destroy()
 
-    def explicit_resize(self, width):
-        if width == self.__previous_width:
+    def get_image_buttons(self) -> list[ImageButton]:
+        return self.__image_buttons
+
+    def explicit_resize(self, width: int, override: bool = False, master=None):
+        if width == self.__previous_width and override is False:
             return
         else:
             self.__previous_width = width
@@ -116,12 +126,10 @@ class InnerResultFrame(tk.Frame):
 
         actual_padx = max(0, (width - ImageButton.actual_width() * new_column_count) / new_column_count)
 
-        height_sum = 0
         row_index = 0
         for column_index, image_button in zip(cycle(range(new_column_count)), self.__image_buttons):
             image_button.grid(column=column_index, row=row_index)
             if column_index == new_column_count - 1:
-                height_sum += image_button.winfo_height()
                 row_index += 1
 
         for column_index in range(new_column_count):
@@ -131,5 +139,7 @@ class InnerResultFrame(tk.Frame):
 
         self.column_count = new_column_count
         self.row_count = new_row_count
-        # self.configure(height=self.row_count * (ImageButton.actual_width() + 32) + (self.row_count + 1) * 8)
-        self.configure(height=height_sum)
+        total_height = self.row_count * ImageButton.actual_height() + (self.row_count + 1) * ImageButton.PADDING
+        self.configure(height=total_height)
+        if master is not None:
+            master.configure(height=total_height)

@@ -2,11 +2,8 @@ import tkinter as tk
 from tkinter import filedialog
 import customtkinter as ctk
 
-from concurrent.futures import ThreadPoolExecutor
-
 
 from . import color
-from . import component
 from .components import result_frame
 from . import draw_canvas
 
@@ -30,11 +27,8 @@ class App(tk.Tk):
         self.Canvas_layer = draw_canvas.DrawCanvas(self, 512, 512)
         self.Canvas_layer.pack(fill="both")
 
-        self.model_option = None
-        self.load_model = None
-
         self.clear_button()
-        # self.retrieve_image_button()
+        self.retrieve_image_button()
         self.erase_button()
         self.pen_button()
 
@@ -43,7 +37,7 @@ class App(tk.Tk):
         if retrieved_workspace == ():
             return
         self.workspace = retrieved_workspace
-        self.panel.update_workspace(self.workspace, self.load_model)
+        self.panel.update_workspace(self.workspace)
 
     def menu_construct(self):
         if getattr(self, "_menu_constructed", False) is True:
@@ -69,16 +63,14 @@ class App(tk.Tk):
         self.playbutton.place(x=50)
         self.playbutton.pack(side="left", anchor="nw")
 
-    # def retrieve_image_button(self):
-    #     self.playbutton = ctk.CTkButton(
-    #         self,
-    #         text="retrieve",
-    #         command=lambda: self.Canvas_layer.retrieve_image(
-    #             model=self.load_model, image_data_list=self.panel.get__panel().image_buttons
-    #         ),
-    #     )
-    #     self.playbutton.place(x=80)
-    #     self.playbutton.pack(side="left", anchor="nw")
+    def retrieve_image_button(self):
+        self.playbutton = ctk.CTkButton(
+            self,
+            text="retrieve",
+            command=lambda: self.Canvas_layer.retrieve_image(self.panel.get_list_of_images()),
+        )
+        self.playbutton.place(x=80)
+        self.playbutton.pack(side="left", anchor="nw")
 
     def erase_button(self):
         self.playbutton = ctk.CTkButton(self, text="erase", command=self.Canvas_layer.bind_eraser)
