@@ -81,7 +81,7 @@ class InnerResultFrame(tk.Frame):
         self.workspace: str | None = None
         self.list_of_images = []
         self.image_buttons = []
-        
+
     def update_workspace(self, workspace: str | None, model):
         self.workspace = workspace
 
@@ -206,7 +206,7 @@ class ImageButton(tk.Frame):
 
     def __load_image_callback(self, image_future: Future[Image.Image]):
         try:
-            image  = image_future.result(timeout=0)
+            image = image_future.result(timeout=0)
             self.tokenized_image_future = image_loader.image_loader.submit(SelfAttention, image, self.model)
             self.tokenized_image_future.add_done_callback(self.__image_tokenize_callback)
 
@@ -218,11 +218,11 @@ class ImageButton(tk.Frame):
         self.image_loader_future = None
         self.image_loaded = True
 
-    def __image_tokenize_callback(self, tokenized_image: Future[Image.Image]) :
-        try :
+    def __image_tokenize_callback(self, tokenized_image: Future[Image.Image]):
+        try:
             self.tokenized_image = tokenized_image.result()
             self.is_image_tokenized = True
-        except Exception as _ :
+        except Exception as _:
             self.tokenized_image = None
             self.is_image_tokenized = False
             return
@@ -286,24 +286,22 @@ def load_image_future(image_button: ImageButton, image_path: str) -> Image.Image
             size=(ImageButton.IMAGE_MAX_DIMENSION, ImageButton.IMAGE_MAX_DIMENSION),
             resample=Image.BILINEAR,
         )
-        
+
     except Exception as _:
         image = Asset.MISSING_IMAGE
 
     return image
 
-def SelfAttention(image, model) :
+
+def SelfAttention(image, model):
     immean = [0.5, 0.5, 0.5]  # RGB channel mean for imagenet
     imstd = [0.5, 0.5, 0.5]
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(immean, imstd)
-    ])
-    tokenized_image = transform(image.resize((224, 224)).convert('RGB'))
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(immean, imstd)])
+    tokenized_image = transform(image.resize((224, 224)).convert("RGB"))
     tokenized_image = tokenized_image.half()
-    tokenized_image= torch.unsqueeze(tokenized_image, 0)
+    tokenized_image = torch.unsqueeze(tokenized_image, 0)
 
     tokenized_image = tokenized_image.cuda()
-    tokenized_image, _ = model(tokenized_image, None, 'test', only_sa=True)
+    tokenized_image, _ = model(tokenized_image, None, "test", only_sa=True)
 
     return tokenized_image

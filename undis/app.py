@@ -46,6 +46,8 @@ class App(tk.Tk):
 
         self.clear_button()
         self.retrieve_image_button()
+        self.erase_button()
+        self.pen_button()
 
     def open_workspace(self):
         retrieved_workspace = filedialog.askdirectory()
@@ -79,19 +81,34 @@ class App(tk.Tk):
         self.playbutton.pack(side="left", anchor="nw")
 
     def retrieve_image_button(self):
-        self.playbutton = ctk.CTkButton(self, text="retrieve", command=lambda: self.Canvas_layer.retrieve_image(model=self.load_model, image_data_list=self.panel.get__panel().image_buttons))
+        self.playbutton = ctk.CTkButton(
+            self,
+            text="retrieve",
+            command=lambda: self.Canvas_layer.retrieve_image(
+                model=self.load_model, image_data_list=self.panel.get__panel().image_buttons
+            ),
+        )
         self.playbutton.place(x=80)
         self.playbutton.pack(side="left", anchor="nw")
         self.debugbutton = ctk.CTkButton(self, text="debug", command=self.Canvas_layer.debug)
         self.debugbutton.place(x=110)
         self.debugbutton.pack(side="left", anchor="nw")
 
-    def thread_pool_executor(self, tasks) :
-        for task in tasks :
+    def thread_pool_executor(self, tasks):
+        for task in tasks:
             future = self.executer.submit(task)
 
     # Load Model
-    def load_module(self) :
+    def load_module(self):
         self.model_option = Option().parse()
         self.load_model = ModelLoader(self.model_option)
 
+    def erase_button(self):
+        self.playbutton = customtkinter.CTkButton(self, text="erase", command=self.Canvas_layer.bind_eraser)
+        self.playbutton.place(x=110)
+        self.playbutton.pack(side="left", anchor="nw")
+
+    def pen_button(self):
+        self.playbutton = customtkinter.CTkButton(self, text="pen", command=self.Canvas_layer.bind_pen)
+        self.playbutton.place(x=130)
+        self.playbutton.pack(side="left", anchor="nw")
