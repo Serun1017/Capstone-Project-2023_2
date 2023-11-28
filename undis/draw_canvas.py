@@ -8,8 +8,7 @@ class DrawCanvas(tkinter.Canvas):
     def __init__(self, master, w, h):
         super().__init__(master=master, width=w, height=h, bg="white")
 
-        self.brush_width = 16
-        self.brush_tip_radius = max(self.brush_width // 2 - 1, 0)
+        self.brush_width = 8
 
         self.bind_pen()
 

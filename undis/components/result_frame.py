@@ -138,7 +138,7 @@ class InnerResultFrame(tk.Frame):
 
         row_count = 0
         for column_index, image_button in zip(
-            range(new_column_count),
+            cycle(range(new_column_count)),
             sorted(filter(lambda x: x.score > self.threshold, self.__image_buttons), reverse=True),
         ):
             image_button.grid(column=column_index, row=row_count)
