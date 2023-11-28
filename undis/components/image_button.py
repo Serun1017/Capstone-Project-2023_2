@@ -35,7 +35,7 @@ class ImageButton(tk.Frame):
         )
         self.image_path = image_path
         self.image_name = os.path.basename(os.path.splitext(self.image_path)[0])
-        self.score: float = 0.0
+        self.score: float = 1
 
         self.image_loader_future = None
         self.tokenize_image_future = None

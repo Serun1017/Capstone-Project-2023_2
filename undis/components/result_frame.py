@@ -103,7 +103,7 @@ class InnerResultFrame(tk.Frame):
         self.row_count = 0
         self.__previous_width = 0
 
-        self.threshold: float = -1.0
+        self.threshold: float = 0.6
         self.__image_buttons: list[ImageButton] = []
 
     def create_buttons_from_list_of_images(self, list_of_images: list[str]):
