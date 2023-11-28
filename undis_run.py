@@ -11,5 +11,6 @@ app = App()
 app.geometry("800x600")
 app.mainloop()
 
+print(os.getcwd())
 # tip
 # use dir() function to dump everything of object
