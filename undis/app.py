@@ -76,8 +76,8 @@ class App(tk.Tk):
 
     def __after_cross_attention(self, rn: Future[Image.Image]):
         try:
-            self.result = rn.result(timeout=0)
-            print(self.result)
+            self.panel.sort_by_result(rn.result(timeout=0))  # type: ignore
+            # print(self.result)
         except Exception as _:
             self.result = None
 
