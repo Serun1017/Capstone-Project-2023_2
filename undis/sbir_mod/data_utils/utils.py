@@ -3,6 +3,7 @@ from PIL import Image
 from torchvision.transforms import transforms
 import cv2
 
+
 def preprocess(image_path, img_type="im"):
     # immean = [0.485, 0.456, 0.406]  # RGB channel mean for imagenet
     # imstd = [0.229, 0.224, 0.225]
@@ -10,15 +11,12 @@ def preprocess(image_path, img_type="im"):
     immean = [0.5, 0.5, 0.5]  # RGB channel mean for imagenet
     imstd = [0.5, 0.5, 0.5]
 
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(immean, imstd)
-    ])
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(immean, imstd)])
 
-    if img_type == 'im':
-        return transform(Image.open(image_path).resize((224, 224)).convert('RGB'))
+    if img_type == "im":
+        return transform(Image.open(image_path).resize((224, 224)).convert("RGB"))
     else:
-        # 对sketch 进行crop，等比例扩大到224
+        # sketch crop， 224
         # 한글 경로 문제
         image_path = np.fromfile(image_path, np.uint8)
         img = cv2.imdecode(image_path, cv2.IMREAD_COLOR)
@@ -34,10 +32,6 @@ def preprocess(image_path, img_type="im"):
 
 def remove_white_space_image(img_np: np.ndarray, padding: int):
     """
-    获取白底图片中, 物体的bbox; 此处白底必须是纯白色.
-    其中, 白底有两种表示方法, 分别是 1.0 以及 255; 在开始时进行检查并且匹配
-    对最大值为255的图片进行操作.
-    三通道的图无法直接使用255进行操作, 为了减小计算, 直接将三通道相加, 值为255*3的pix 认为是白底.
     :param img_np:
     :return:
     """
@@ -50,14 +44,16 @@ def remove_white_space_image(img_np: np.ndarray, padding: int):
     img_np_single = np.sum(img_np, axis=2)
     Y, X = np.where(img_np_single <= 300)  # max = 300
     ymin, ymax, xmin, xmax = np.min(Y), np.max(Y), np.min(X), np.max(X)
-    img_cropped = img_np[max(0, ymin - padding):min(h, ymax + padding), max(0, xmin - padding):min(w, xmax + padding), # type: ignore
-                  :]
+    img_cropped = img_np[
+        max(0, ymin - padding) : min(h, ymax + padding),  # type: ignore
+        max(0, xmin - padding) : min(w, xmax + padding),  # type: ignore
+        :,
+    ]
     return img_cropped
 
 
 def resize_image_by_ratio(img_np: np.ndarray, size: int):
     """
-    按照比例resize
     :param img_np:
     :param size:
     :return:
@@ -70,11 +66,23 @@ def resize_image_by_ratio(img_np: np.ndarray, size: int):
     else:
         assert 0
 
-    ratio = h / w # type: ignore
-    if h > w: # type: ignore
-        new_img = cv2.resize(img_np, (int(size / ratio), size,))  # resize is w, h  (fx, fy...)
+    ratio = h / w  # type: ignore
+    if h > w:  # type: ignore
+        new_img = cv2.resize(
+            img_np,
+            (
+                int(size / ratio),
+                size,
+            ),
+        )  # resize is w, h  (fx, fy...)
     else:
-        new_img = cv2.resize(img_np, (size, int(size * ratio),))
+        new_img = cv2.resize(
+            img_np,
+            (
+                size,
+                int(size * ratio),
+            ),
+        )
     # new_img[np.where(new_img < 200)] = 0
     return new_img
 
@@ -122,7 +130,6 @@ def make_img_square(img_np: np.ndarray):
             return new_img
 
 
-# 每个label，对应一个数字
 def create_dict_texts(texts):
     texts = list(texts)
     dicts = {l: i for i, l in enumerate(texts)}

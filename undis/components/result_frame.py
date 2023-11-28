@@ -42,7 +42,16 @@ class ResultFrame(tk.Canvas):
                     self.list_of_images.append(full_file_path)
 
         self.__inner_frame.create_buttons_from_list_of_images(self.list_of_images)
-        self.__inner_frame.explicit_resize(width=self.__inner_frame.winfo_width(), override=True, master=self)
+        self.__inner_frame.explicit_config(width=self.__inner_frame.winfo_width(), override=True, master=self)
+        self.configure(scrollregion=self.bbox(tk.ALL))
+
+    def sort_by_result(self, result: list[list[str]]):
+        scores, image_paths = result[0], result[1]
+        image_buttons = self.__inner_frame.get_image_buttons()
+        for score, image_path in zip(scores, image_paths):
+            for image_button in filter(lambda x: x.image_path == image_path, image_buttons):
+                image_button.score = float(score)
+        self.__inner_frame.explicit_config(width=self.__inner_frame.winfo_width(), override=True, master=self)
         self.configure(scrollregion=self.bbox(tk.ALL))
 
     def get_list_of_tokens(self) -> list[tuple[str, transforms.Tensor]]:
@@ -53,7 +62,7 @@ class ResultFrame(tk.Canvas):
 
     def handler_resize(self, event):
         self.__inner_frame.configure(width=event.width - self.__scroll_bar.winfo_width())
-        self.__inner_frame.explicit_resize(width=event.width - self.__scroll_bar.winfo_width())
+        self.__inner_frame.explicit_config(width=event.width - self.__scroll_bar.winfo_width())
         self.configure(scrollregion=self.bbox(tk.ALL))
 
     def handler_hover_enter(self, _):
@@ -91,11 +100,11 @@ class InnerResultFrame(tk.Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master=master, bg=color.DARK_BACKGROUND, **kwargs)
 
-        self.column_count = 0
         self.row_count = 0
         self.__previous_width = 0
 
-        self.__image_buttons = []
+        self.threshold: float = -1.0
+        self.__image_buttons: list[ImageButton] = []
 
     def create_buttons_from_list_of_images(self, list_of_images: list[str]):
         for button in self.__image_buttons:
@@ -112,34 +121,37 @@ class InnerResultFrame(tk.Frame):
     def get_image_buttons(self) -> list[ImageButton]:
         return self.__image_buttons
 
-    def explicit_resize(self, width: int, override: bool = False, master=None):
+    def explicit_config(self, width: int, override: bool = False, master=None):
         if width == self.__previous_width and override is False:
             return
         else:
             self.__previous_width = width
 
-        images_count = len(self.__image_buttons)
-        minimum_padx = 8
+        for image_button in self.__image_buttons:
+            image_button.grid_remove()
+
+        minimum_padx = ImageButton.PADDING
 
         new_column_count = max(1, int((width - minimum_padx) / (ImageButton.actual_width() + minimum_padx)))
-        new_row_count = images_count // new_column_count
 
         actual_padx = max(0, (width - ImageButton.actual_width() * new_column_count) / new_column_count)
 
-        row_index = 0
-        for column_index, image_button in zip(cycle(range(new_column_count)), self.__image_buttons):
-            image_button.grid(column=column_index, row=row_index)
+        row_count = 0
+        for column_index, image_button in zip(
+            range(new_column_count),
+            sorted(filter(lambda x: x.score > self.threshold, self.__image_buttons), reverse=True),
+        ):
+            image_button.grid(column=column_index, row=row_count)
             if column_index == new_column_count - 1:
-                row_index += 1
+                column_index = 0
+                row_count += 1
 
         for column_index in range(new_column_count):
             self.grid_columnconfigure(column_index, minsize=ImageButton.actual_width(), pad=actual_padx)
-        for row_index in range(self.row_count, new_row_count):
-            self.grid_rowconfigure(row_index, minsize=ImageButton.actual_width() + 32, pad=8)
+        for row_count in range(row_count):
+            self.grid_rowconfigure(row_count, minsize=ImageButton.actual_height(), pad=ImageButton.PADDING)
 
-        self.column_count = new_column_count
-        self.row_count = new_row_count
-        total_height = self.row_count * ImageButton.actual_height() + (self.row_count + 1) * ImageButton.PADDING
+        total_height = row_count * ImageButton.actual_height() + (row_count + 1) * ImageButton.PADDING
         self.configure(height=total_height)
         if master is not None:
             master.configure(height=total_height)

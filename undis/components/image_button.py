@@ -1,8 +1,10 @@
+import math
 import os
 from concurrent.futures import Future
 import tkinter as tk
 import tkinter.font as tkfont
 from PIL import Image, ImageTk
+from typing import Self
 
 import torch
 from torchvision.transforms import transforms
@@ -33,6 +35,7 @@ class ImageButton(tk.Frame):
         )
         self.image_path = image_path
         self.image_name = os.path.basename(os.path.splitext(self.image_path)[0])
+        self.score: float = 0.0
 
         self.image_loader_future = None
         self.tokenize_image_future = None
@@ -50,6 +53,18 @@ class ImageButton(tk.Frame):
         self.__inner_frame.bind(sequence="<Enter>", func=self.handler_hover_enter)
         self.__inner_frame.bind(sequence="<Leave>", func=self.handler_hover_exit)
         self.handler_hover_exit(None)  # start from non-hover state
+
+    def __lt__(self, other: Self) -> bool:
+        return self.score < other.score
+
+    def __le__(self, other: Self) -> bool:
+        return self.score <= other.score
+
+    def __gt__(self, other: Self) -> bool:
+        return self.score > other.score
+
+    def __ge__(self, other: Self) -> bool:
+        return self.score >= other.score
 
     def destroy(self):
         # if self.image_loader_future is not None:
@@ -74,7 +89,7 @@ class ImageButton(tk.Frame):
             self.image_loader_future = None
             self.image_loaded = True
 
-            self.tokenize_image_future = asset_loader.submit(SelfAttention, image, Asset.MODEL)
+            self.tokenize_image_future = asset_loader.submit(SelfAttention, image, Asset.MODEL.result())
             self.tokenize_image_future.add_done_callback(self.__image_tokenize_callback)
         except Exception as _:
             self.image_loader_future = None
