@@ -45,7 +45,7 @@ class ResultFrame(tk.Canvas):
         self.__inner_frame.explicit_resize(width=self.__inner_frame.winfo_width(), override=True, master=self)
         self.configure(scrollregion=self.bbox(tk.ALL))
 
-    def get_list_of_images(self) -> list[tuple[str, transforms.Tensor]]:
+    def get_list_of_tokens(self) -> list[tuple[str, transforms.Tensor]]:
         list_of_images = []
         for image_button in self.__inner_frame.get_image_buttons():
             list_of_images.append((image_button.image_path, image_button.tokenized_image))

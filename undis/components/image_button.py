@@ -52,10 +52,10 @@ class ImageButton(tk.Frame):
         self.handler_hover_exit(None)  # start from non-hover state
 
     def destroy(self):
-        if self.image_loader_future is not None:
-            self.image_loader_future.cancel()
-        if self.tokenize_image_future is not None:
-            self.tokenize_image_future.cancel()
+        # if self.image_loader_future is not None:
+        #     self.image_loader_future.cancel()
+        # if self.tokenize_image_future is not None:
+        #     self.tokenize_image_future.cancel()
         super().destroy()
 
     def unload_image(self):
@@ -69,7 +69,6 @@ class ImageButton(tk.Frame):
 
     def __load_image_callback(self, image_future: Future[Image.Image]):
         try:
-            print("image loaded")
             image = image_future.result(timeout=0)
             self.__inner_frame.set_image(image=ImageTk.PhotoImage(image=image, size=stretch_image_size(image.size)))
             self.image_loader_future = None
