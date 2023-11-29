@@ -57,6 +57,6 @@ class DrawCanvas(tkinter.Canvas):
         print(self.coords(1))
 
     def erase(self, event):
-        target_object_ids = self.find_overlapping(event.x - 4, event.y - 4, event.x + 4, event.y + 4)
+        target_object_ids = self.find_overlapping(event.x - 2, event.y - 2, event.x + 2, event.y + 2)
         for target_object_id in target_object_ids:
             self.delete(target_object_id)

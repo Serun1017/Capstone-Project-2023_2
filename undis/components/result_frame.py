@@ -151,7 +151,7 @@ class InnerResultFrame(tk.Frame):
         for row_count in range(row_count):
             self.grid_rowconfigure(row_count, minsize=ImageButton.actual_height(), pad=ImageButton.PADDING)
 
-        total_height = row_count * ImageButton.actual_height() + (row_count + 1) * ImageButton.PADDING
+        total_height = row_count * ImageButton.actual_height() + (row_count + 1) * ImageButton.PADDING + 1024
         self.configure(height=total_height)
         if master is not None:
             master.configure(height=total_height)
