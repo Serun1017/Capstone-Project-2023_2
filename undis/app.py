@@ -21,7 +21,7 @@ class App(tk.Tk):
         super().__init__()
         self.title("undis")
         self.resizable(True, True)
-        self.minsize(512, 512)
+        self.minsize(720, 512)
 
         self.configure(bg=color.DARK_BACKGROUND)
 
@@ -30,15 +30,28 @@ class App(tk.Tk):
         self.menu_construct()
 
         self.panel = result_frame.ResultFrame(master=self)
+        self.panel.grid(column=1, row=0, rowspan=2, sticky=tk.NSEW)
 
-        self.panel.pack(side="right", fill="both", expand=True)
+        # self.panel.pack(side="right", fill="both", expand=True)
         self.Canvas_layer = draw_canvas.DrawCanvas(self, 512, 512)
-        self.Canvas_layer.pack(fill="both")
+        self.Canvas_layer.grid(column=0, row=0)
 
-        self.clear_button()
-        self.retrieve_image_button()
-        self.erase_button()
-        self.pen_button()
+        buttons_frame = ctk.CTkFrame(self)
+        buttons_frame.grid(column=0, row=1, sticky=tk.NSEW)
+
+        self.grid_columnconfigure(0, weight=0)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=1)
+
+        self.button_panel = ctk.CTkFrame(master=self)
+        self.buttons(master=self.button_panel)
+        self.button_panel.grid(column=0, row=1, sticky=tk.NSEW)
+
+        # self.clear_button()
+        # self.retrieve_image_button()
+        # self.erase_button()
+        # self.pen_button()
 
     def destroy(self):
         asset_loader.shutdown(wait=False, cancel_futures=True)
@@ -100,29 +113,27 @@ class App(tk.Tk):
         self.configure(menu=menu_bar)
         self._menu_constructed = True
 
-    def clear_button(self):
-        self.playbutton = ctk.CTkButton(self, text="clear", command=self.Canvas_layer.clear)
-        self.playbutton.place(x=50)
-        self.playbutton.pack(side="left", anchor="nw")
+    def buttons(self, master):
+        draw_mode_var = tk.IntVar(value=0)
+        brush_button = ctk.CTkRadioButton(
+            master, text="brush", variable=draw_mode_var, value=0, command=self.Canvas_layer.bind_pen
+        )
+        brush_button.grid(column=0, row=0)
+        eraser_button = ctk.CTkRadioButton(
+            master, text="eraser", variable=draw_mode_var, value=1, command=self.Canvas_layer.bind_eraser
+        )
+        eraser_button.grid(column=1, row=0)
 
-    def retrieve_image_button(self):
-        self.playbutton = ctk.CTkButton(
-            self,
+        clear_button = ctk.CTkButton(master, text="clear", command=self.Canvas_layer.clear)
+        clear_button.grid(column=2, row=0, sticky=tk.E)
+        retrieve_button = ctk.CTkButton(
+            master,
             text="retrieve",
             command=self.retrieve_images_with_sketch,
         )
-        self.playbutton.place(x=80)
-        self.playbutton.pack(side="left", anchor="nw")
-
-    def erase_button(self):
-        self.playbutton = ctk.CTkButton(self, text="erase", command=self.Canvas_layer.bind_eraser)
-        self.playbutton.place(x=110)
-        self.playbutton.pack(side="left", anchor="nw")
-
-    def pen_button(self):
-        self.playbutton = ctk.CTkButton(self, text="pen", command=self.Canvas_layer.bind_pen)
-        self.playbutton.place(x=130)
-        self.playbutton.pack(side="left", anchor="nw")
+        retrieve_button.grid(column=2, row=100, sticky=tk.SE)
+        master.grid_columnconfigure(2, weight=1)
+        master.grid_rowconfigure(100, weight=1)
 
 
 # Load sk_data (numpy array) and preprocecss the sketch.

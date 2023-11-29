@@ -8,7 +8,7 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme(os.path.join(os.path.dirname(__file__), "assets", "theme.json"))
 
 app = App()
-app.geometry("800x600")
+app.geometry("1280x720")
 app.mainloop()
 
 print(os.getcwd())
