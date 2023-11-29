@@ -1,7 +1,6 @@
-import os
-from concurrent.futures import ThreadPoolExecutor, Future
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
-from typing import final, Any
+from typing import final
 
 from .sbir_mod.ModelLoad import load_model
 from .sbir_mod.options import Option

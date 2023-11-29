@@ -1,4 +1,3 @@
-import math
 import os
 from concurrent.futures import Future
 import tkinter as tk
@@ -45,7 +44,7 @@ class ImageButton(tk.Frame):
         self.tokenized_image = transforms.Tensor
 
         self.__inner_frame = _InnerFrame(master=self, text=self.image_name, borderwidth=0)
-        self.__inner_frame.pack()
+        self.__inner_frame.pack(fill=tk.BOTH, expand=True)
         self.load_image(self.image_path)
 
         self.__inner_frame.bind(sequence="<Button-3>", func=self.handler_right_click)
@@ -141,7 +140,7 @@ class _InnerFrame(tk.Frame):
             **kwargs,
         )
         self.image_frame = tk.Frame(master=self, padx=ImageButton.PADDING, pady=ImageButton.PADDING, borderwidth=0)
-        self.image_frame.grid(column=0, row=0)
+        self.image_frame.grid(row=0, column=0)
         util.add_bindtag_to(bindtag_of=self, to=self.image_frame)
         self.image_label = tk.Label(master=self.image_frame, padx=0, pady=0, borderwidth=0)
         self.image_label.pack(fill=tk.BOTH, expand=True)
@@ -159,6 +158,9 @@ class _InnerFrame(tk.Frame):
         )
         self.image_name_text.grid(row=1, column=0, sticky=tk.N)
         util.add_bindtag_to(bindtag_of=self, to=self.image_name_text)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
     def set_image(self, image: ImageTk.PhotoImage):
         self.__image = image

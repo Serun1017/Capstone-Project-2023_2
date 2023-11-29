@@ -30,23 +30,15 @@ class App(tk.Tk):
         self.menu_construct()
 
         self.panel = result_frame.ResultFrame(master=self)
-        self.panel.grid(column=1, row=0, rowspan=2, sticky=tk.NSEW)
+        self.panel.pack(side="right", fill=tk.BOTH, expand=True)
 
         # self.panel.pack(side="right", fill="both", expand=True)
         self.Canvas_layer = draw_canvas.DrawCanvas(self, 512, 512)
-        self.Canvas_layer.grid(column=0, row=0)
-
-        buttons_frame = ctk.CTkFrame(self)
-        buttons_frame.grid(column=0, row=1, sticky=tk.NSEW)
-
-        self.grid_columnconfigure(0, weight=0)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure(1, weight=1)
+        self.Canvas_layer.pack(fill=tk.BOTH)
 
         self.button_panel = ctk.CTkFrame(master=self)
         self.buttons(master=self.button_panel)
-        self.button_panel.grid(column=0, row=1, sticky=tk.NSEW)
+        self.button_panel.pack(fill=tk.BOTH, expand=True)
 
         # self.clear_button()
         # self.retrieve_image_button()
